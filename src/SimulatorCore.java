@@ -8,10 +8,10 @@ public class SimulatorCore implements IRunner {
     static int numThreads = 10;
     private static long globalStartTime;
     private static double[][] parameterVariations;
-    private static int numParameterVariations;
+    private static int numParameterVaried;
     private static String[][] variations;
     private static int totalNumSimulations;
-    private static int numParameterSettings;
+    private static int numParameterVariationSettings;
     private final String simulationName;
     private Thread thread;
     private static int readyCount = 0;
@@ -23,8 +23,11 @@ public class SimulatorCore implements IRunner {
     private final static int INFECTION_PROB = 1;
     private final static int RECOVER_TIME = 2;
     private final static int QARANTINE_PROB = 3;
+    private final static int QUARANTINE_TIME = 4;
 
-    private final static String[] parameterNames = new String[4];
+    private static String[] parameterNames;
+    private static double averageSimusPerSecond = 0.0;
+    private static int averageSimusCounter = 0;
 //    private long duration;
 
     /// constructor
@@ -39,7 +42,7 @@ public class SimulatorCore implements IRunner {
     private static void printParameterVariations() {
 
         MTools.println();
-        MTools.println(numParameterVariations + " parameters varied in " + numParameterSettings + " settings - number of all variations " + Combinizer.getNumberAllVariations());
+        MTools.println("These " + numParameterVaried + " parameters are varied in " + numParameterVariationSettings + " settings - number of all variation combinations: " + Combinizer.getNumberAllVariations());
         for (int n = 0; n < parameterVariations.length; n++) {
             MTools.print(parameterNames[n]);
             for (int col = 0; col < parameterVariations[n].length; col++) {
@@ -55,54 +58,60 @@ public class SimulatorCore implements IRunner {
 //        combinizer.printVariations();
     }
 
-    private static void createParameterVariations(int numCols) {
+    private static void createParameterVariations(int numSettingsCols) {
 
+        numParameterVaried = 5;
+        parameterNames = new String[numParameterVaried];
         parameterNames[0] = "number individuals:     ";
         parameterNames[1] = "infection probability:  ";
         parameterNames[2] = "recover time:           ";
         parameterNames[3] = "quarantine probability: ";
+        parameterNames[4] = "quarantine time:        ";
 
-        PlayGround.scale = 1.0;
+        /// possible parameters to vary
         PlayGround.worldSize = 160 * PlayGround.scale;
         PlayGround.numIndividuals = (int) (PlayGround.numIndividuals * PlayGround.scale * PlayGround.scale);
         PlayGround.infectionRadius = 5 * PlayGround.scale;
-        PlayGround.quarantineTime = 300;
 
-        /// initialize simulation run parameter matrix of these n parameters
+        /// initialize simulation run parameter matrix of these [numParameterVariations] parameters
 
-        numParameterVariations = 4;
         double delta;
-        parameterVariations = new double[numParameterVariations][numCols];
+        parameterVariations = new double[numParameterVaried][numSettingsCols];
 
         PlayGround.quarantineProbability = 0.01;
         double maxQuarantineProbability = 1.0;
-        delta = (maxQuarantineProbability - PlayGround.quarantineProbability) / (double) (numCols - 1);
-        for (int i = 0; i < numCols; i++) {
+        delta = (maxQuarantineProbability - PlayGround.quarantineProbability) / (double) (numSettingsCols - 1);
+        for (int i = 0; i < numSettingsCols; i++) {
             parameterVariations[QARANTINE_PROB][i] = PlayGround.quarantineProbability + (i * delta);
         }
 
         PlayGround.numIndividuals = 400;
         double maxNumIndividuals = 600;
-        delta = (maxNumIndividuals - PlayGround.numIndividuals) / (double) (numCols - 1);
-        for (int i = 0; i < numCols; i++) {
+        delta = (maxNumIndividuals - PlayGround.numIndividuals) / (double) (numSettingsCols - 1);
+        for (int i = 0; i < numSettingsCols; i++) {
             parameterVariations[NUM_INDIVIDUALS][i] = (int) (PlayGround.numIndividuals + (i * delta));
         }
 
         PlayGround.infectionProbability = 0.01;
         double maxInfectionProbability = 1.0;
-        delta = (maxInfectionProbability - PlayGround.infectionProbability) / (double) (numCols - 1);
-        for (int i = 0; i < numCols; i++) {
+        delta = (maxInfectionProbability - PlayGround.infectionProbability) / (double) (numSettingsCols - 1);
+        for (int i = 0; i < numSettingsCols; i++) {
             parameterVariations[INFECTION_PROB][i] = PlayGround.infectionProbability + (i * delta);
+        }
+
+        PlayGround.quarantineTime = 200;
+        double maxQuarantineTime = 400;
+        delta = (maxNumIndividuals - PlayGround.quarantineTime) / (double) (numSettingsCols - 1);
+        for (int i = 0; i < numSettingsCols; i++) {
+            parameterVariations[QUARANTINE_TIME][i] = (int) (PlayGround.quarantineTime + (i * delta));
         }
 
         PlayGround.recoverTime = 500;
         double maxRecoverTime = 700;
-        delta = (maxRecoverTime - PlayGround.recoverTime) / (double) (numCols - 1);
-        for (int i = 0; i < numCols; i++) {
+        delta = (maxRecoverTime - PlayGround.recoverTime) / (double) (numSettingsCols - 1);
+        for (int i = 0; i < numSettingsCols; i++) {
             parameterVariations[RECOVER_TIME][i] = (int) (PlayGround.recoverTime + (i * delta));
         }
-
-//        printParameterVariations();
     }
 
     @Override
@@ -121,7 +130,7 @@ public class SimulatorCore implements IRunner {
 //        MTools.println("");
 //        MTools.println("/// next variation: " + actualVariation + " of " + variations.length);
 
-        for (int paramVariation = 0; paramVariation < numParameterVariations; paramVariation++) {
+        for (int paramVariation = 0; paramVariation < numParameterVaried; paramVariation++) {
 
             /// actualVariation starts from 1 NOT 0
             String str = variations[actualVariation - 1][paramVariation];
@@ -183,6 +192,8 @@ public class SimulatorCore implements IRunner {
         printProgress();
 
         if (setNextParameterVariation()) {
+            double val = 1000 * (averageSimusPerSecond / (double) averageSimusCounter);
+            MTools.println("average simulations rer second: " + Util.myFormatter(val, 5,2));
             return; // all work is done
         }
 
@@ -209,6 +220,9 @@ public class SimulatorCore implements IRunner {
         int sims = PlayGround.numSimulations * numThreads;
 
         double simusPerMilliSecond = (double) totalSimulationCount / (double) (globalDuration);
+
+        averageSimusPerSecond += simusPerMilliSecond;
+        averageSimusCounter++;
 
         String sDuration = Util.millisToTimeString(globalDuration);
 
@@ -242,7 +256,10 @@ public class SimulatorCore implements IRunner {
     private static long calculateEstimate() {
 
         totalNumSimulations = numThreads * PlayGround.numSimulations * variations.length;
-        double experience = 10; // realistic average simulations per second
+
+        // realistic value for simulations per second on MacBook PRO i7 2.8 GHz 8 cores
+        double experience = 9.8;
+
         return 1000 * (long) ((double) totalNumSimulations / (double) experience);
     }
 
@@ -250,21 +267,23 @@ public class SimulatorCore implements IRunner {
     public static void main(String[] args) throws FileNotFoundException {
 
         globalStartTime = System.currentTimeMillis();
+        averageSimusPerSecond = 0.0;
+        averageSimusCounter = 0;
 
         numThreads = 10;
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
-        PlayGround.numSimulations = 10;
+        PlayGround.numSimulations = 1000;
 
-        numParameterSettings = 3;
-        createParameterVariations(numParameterSettings);
-        createGeneralVariations(numParameterVariations, numParameterSettings);
+        numParameterVariationSettings = 6;
+        createParameterVariations(numParameterVariationSettings);
+        createGeneralVariations(numParameterVaried, numParameterVariationSettings);
 
         long estimate = calculateEstimate();
 
         String path = System.getProperty("user.home") + "/CoronaSimulationData/Simulation protocol "
                 + Util.getDateString(globalStartTime)
                 + "-" + Util.getTimeStringNow(globalStartTime) + ".txt";
-        MTools.println( path );
+        MTools.println(path);
         MTools.init(path, false);
 
         MTools.println("Total number of simulations:    " + totalNumSimulations);
@@ -277,7 +296,7 @@ public class SimulatorCore implements IRunner {
 
         MTools.println();
 
-        startAllSimulations();
+//        startAllSimulations();
     }
 }
 
