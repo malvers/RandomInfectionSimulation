@@ -43,7 +43,13 @@ public class SimulatorCore implements IRunner {
     private static void printParameterVariations() {
 
         MTools.println();
-        MTools.println("These " + numParameterVaried + " parameters are varied in " + numParameterVariationSettings + " settings - number of all variation combinations: " + Combinizer.getNumberAllVariations());
+
+        MTools.println("These " + numParameterVaried +
+                " parameters are varied in " +
+                numParameterVariationSettings +
+                " settings - number of all variation combinations: " +
+                Combinizer.getNumberAllVariations());
+
         for (int n = 0; n < parameterVariations.length; n++) {
             MTools.print(parameterNames[n]);
             for (int col = 0; col < parameterVariations[n].length; col++) {
@@ -295,11 +301,11 @@ public class SimulatorCore implements IRunner {
 
         long estimate = calculateEstimate();
 
-        String path = System.getProperty("user.home") + "/test"
-//                + File.separator + "CoronaSimulationData"
-//                + File.separator + "Simulation_protocol "
-//                + Util.getDateString(globalStartTime)
-//                + "-" + Util.getTimeStringNow(globalStartTime)
+        String path = System.getProperty("user.home")
+                + File.separator + "CoronaSimulationData"
+                + File.separator + "simulation protocol "
+                + Util.getDateString(globalStartTime)
+                + "-" + Util.getTimeStringNow(globalStartTime)
                 + ".txt";
         MTools.println("path: " + path);
         MTools.init(path, false);

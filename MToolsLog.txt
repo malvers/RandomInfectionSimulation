@@ -1,1 +1,1 @@
-path: /Users/malvers/test.txt
+path: /Users/malvers/CoronaSimulationData/simulation protocol 2020.05.02-14.00.56.442.txt
