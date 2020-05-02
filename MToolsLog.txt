@@ -1,1 +1,1 @@
-C:\Users\Dr. Michael R.Alvers\CoronaSimulationData\Simulation_protocol 2020.05.02-10.53.34.227.txt
+path: /Users/malvers/test.txt

@@ -1,5 +1,6 @@
 import mratools.MTools;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 public class SimulatorCore implements IRunner {
@@ -193,11 +194,25 @@ public class SimulatorCore implements IRunner {
 
         if (setNextParameterVariation()) {
             double val = 1000 * (averageSimusPerSecond / (double) averageSimusCounter);
-            MTools.println("average simulations rer second: " + Util.myFormatter(val, 5,2));
+            MTools.println("average simulations rer second: " + Util.myFormatter(val, 5, 2));
+            sendReadyEmail();
             return; // all work is done
         }
 
         startAllSimulations();
+    }
+
+    private void sendReadyEmail() {
+        SimpleEmailer emailer = new SimpleEmailer();
+        String message = "Ready at: " + Util.getTimeStringNow(System.currentTimeMillis());
+        try {
+            emailer.sendEmail("cloud.transinsight.com",
+                    "malvers@transinsight.com", "Dr. Michael R. Alvers",
+                    "malvers@transinsight.com", "Dr. Michael R. Alvers",
+                    "Message " + getClass(), message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static String getEstimateReadyDateAndTime(long estimate) {
@@ -239,7 +254,7 @@ public class SimulatorCore implements IRunner {
                 + " - ready: " + getEstimateReadyDateAndTime(timeToGo));
 
         grapher.calcAverageInfectionCurve();
-        grapher.writeData(System.getProperty("user.home") + "\\CoronaSimulationData");
+        grapher.writeData(System.getProperty("user.home") + File.separator + "CoronaSimulationData");
     }
 
     private static void startAllSimulations() {
@@ -272,18 +287,21 @@ public class SimulatorCore implements IRunner {
 
         numThreads = 10;
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
-        PlayGround.numSimulations = 1000;
+        PlayGround.numSimulations = 10;
 
-        numParameterVariationSettings = 6;
+        numParameterVariationSettings = 3;
         createParameterVariations(numParameterVariationSettings);
         createGeneralVariations(numParameterVaried, numParameterVariationSettings);
 
         long estimate = calculateEstimate();
 
-        String path = System.getProperty("user.home") + "\\CoronaSimulationData\\Simulation_protocol "
-                + Util.getDateString(globalStartTime)
-              + "-" + Util.getTimeStringNow(globalStartTime) + ".txt";
-        MTools.println(path);
+        String path = System.getProperty("user.home") + "/test"
+//                + File.separator + "CoronaSimulationData"
+//                + File.separator + "Simulation_protocol "
+//                + Util.getDateString(globalStartTime)
+//                + "-" + Util.getTimeStringNow(globalStartTime)
+                + ".txt";
+        MTools.println("path: " + path);
         MTools.init(path, false);
 
         MTools.println("Total number of simulations:    " + totalNumSimulations);
