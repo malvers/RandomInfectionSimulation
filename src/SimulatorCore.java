@@ -67,6 +67,7 @@ public class SimulatorCore implements IRunner {
 
     private static void createParameterVariations(int numSettingsCols) {
 
+        /// ATTENTION! If changed here search for ADJUST_ALSO
         numParameterVaried = 5;
         parameterNames = new String[numParameterVaried];
         parameterNames[0] = "number individuals:     ";
@@ -144,6 +145,7 @@ public class SimulatorCore implements IRunner {
             int choice = str.indexOf("1");
             double value = parameterVariations[paramVariation][choice];
 
+            /// ADJUST_ALSO
             if (paramVariation == NUM_INDIVIDUALS) {
                 PlayGround.numIndividuals = (int) value;
             }
@@ -152,6 +154,9 @@ public class SimulatorCore implements IRunner {
             }
             if (paramVariation == QARANTINE_PROB) {
                 PlayGround.quarantineProbability = value;
+            }
+            if (paramVariation == QUARANTINE_TIME) {
+                PlayGround.quarantineTime = (int) value;
             }
             if (paramVariation == RECOVER_TIME) {
                 PlayGround.recoverTime = (int) value;
@@ -196,11 +201,11 @@ public class SimulatorCore implements IRunner {
 
         readyCount = 0;
 
-        printProgress();
+        printAndWriteProgress();
 
         if (setNextParameterVariation()) {
             double val = 1000 * (averageSimusPerSecond / (double) averageSimusCounter);
-            MTools.println("average simulations rer second: " + Util.myFormatter(val, 5, 2));
+            MTools.println("average simulations per second: " + Util.myFormatter(val, 5, 2));
             sendReadyEmail();
             return; // all work is done
         }
@@ -235,7 +240,7 @@ public class SimulatorCore implements IRunner {
                 + " + " + Util.getTimeStringNow(System.currentTimeMillis()));
     }
 
-    private void printProgress() {
+    private void printAndWriteProgress() {
 
         long globalDuration = System.currentTimeMillis() - globalStartTime;
         int sims = PlayGround.numSimulations * numThreads;
@@ -295,7 +300,7 @@ public class SimulatorCore implements IRunner {
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
         PlayGround.numSimulations = 1;
 
-        numParameterVariationSettings = 3;
+        numParameterVariationSettings = 2;
         createParameterVariations(numParameterVariationSettings);
         createGeneralVariations(numParameterVaried, numParameterVariationSettings);
 

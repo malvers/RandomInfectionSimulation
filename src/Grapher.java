@@ -1,3 +1,5 @@
+import mratools.MTools;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -139,6 +141,8 @@ public class Grapher extends JPanel {
         PrintWriter pw = null;
         try {
             pw = new PrintWriter(fileName);
+
+//            MTools.println( "writeData: " + fileName);
 
             pw.write("// " + fileName + "\n");
             pw.write("//  ns - number simulations:     " + PlayGround.numSimulations * SimulatorCore.numThreads + "\n");
