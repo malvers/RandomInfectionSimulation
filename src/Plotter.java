@@ -1,12 +1,16 @@
+import mratools.MTools;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Plotter extends JPanel {
@@ -21,39 +25,66 @@ public class Plotter extends JPanel {
         readData();
     }
 
+    private List<String> listFiles() {
+
+
+        List<String> files = new ArrayList<>();
+        String pathToData = System.getProperty("user.home") + File.separator + "CoronaSimulationData";
+
+        File folder = new File(pathToData);
+        File[] listOfFiles = folder.listFiles();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+
+                String name = pathToData + File.separator + listOfFiles[i].getName();
+                if (name.endsWith(".simu")) {
+                    files.add(name);
+                    MTools.println(i + " name: " + name);
+                }
+            }
+        }
+        return files;
+    }
+
     private void readData() throws IOException {
 
         Charset charset = Charset.forName("US-ASCII");
-        String name = "cw 10000 in 500 rt 600 ip 0.01 ws 160.0 is 4.0 qp 0.0 qt 300 sf 1.0.txt";
-        Path p = Paths.get(name);
-        String line = null;
-        BufferedReader reader = Files.newBufferedReader(p, charset);
 
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith("//")) {
-                continue;
-            } else {
-                break;
+        List<String> files = listFiles();
+
+        for ( String name  : files ) {
+
+            String line;
+            BufferedReader reader = Files.newBufferedReader(Paths.get(name), charset);
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("//")) {
+                    continue;
+                } else {
+                    break;
+                }
             }
-        }
-        numberCurves = Integer.parseInt(line);
-        line = reader.readLine();
-        maxTimeSteps = Integer.parseInt(line);
 
-        data = new double[maxTimeSteps][numberCurves * 4];
+            numberCurves = Integer.parseInt(line);
+            line = reader.readLine();
+            maxTimeSteps = Integer.parseInt(line);
 
-        int lineCount = 0;
-        while ((line = reader.readLine()) != null) {
+            data = new double[maxTimeSteps][numberCurves * 4];
 
-            if (line.startsWith("/")) {
-                continue;
-            }
-            lineCount++;
-            StringTokenizer tok = new StringTokenizer(line);
+            int lineCount = 0;
+            while ((line = reader.readLine()) != null) {
 
-            int di = 0;
-            while (tok.hasMoreElements()) {
-                data[lineCount][di++] = Double.parseDouble(tok.nextToken());
+                if (line.startsWith("/")) {
+                    continue;
+                }
+                lineCount++;
+                StringTokenizer tok = new StringTokenizer(line);
+
+                int di = 0;
+                while (tok.hasMoreElements()) {
+                    data[lineCount][di++] = Double.parseDouble(tok.nextToken());
+                }
             }
         }
     }

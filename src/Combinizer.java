@@ -47,7 +47,7 @@ public class Combinizer {
 //        MTools.println("Create possibilities ...");
         createPossibilities(cols);
 
-//        printPossibilities();
+        printPossibilities();
 //        printCombinations();
 
 
@@ -126,6 +126,6 @@ public class Combinizer {
 
     /// main for testing
     public static void main(String[] args) {
-        new Combinizer(4,2);
+        new Combinizer(8,3);
     }
 }

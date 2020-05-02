@@ -134,7 +134,7 @@ public class Grapher extends JPanel {
                 + " qp " + Util.myFormatter(PlayGround.quarantineProbability * 100, 5, 2) + "[%]"
                 + " qt " + PlayGround.quarantineTime
                 + " sf " + PlayGround.scale
-                + ".txt";
+                + ".simu";
 
         PrintWriter pw = null;
         try {

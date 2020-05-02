@@ -293,7 +293,7 @@ public class SimulatorCore implements IRunner {
 
         numThreads = 10;
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
-        PlayGround.numSimulations = 10;
+        PlayGround.numSimulations = 1;
 
         numParameterVariationSettings = 3;
         createParameterVariations(numParameterVariationSettings);
@@ -307,6 +307,7 @@ public class SimulatorCore implements IRunner {
                 + Util.getDateString(globalStartTime)
                 + "-" + Util.getTimeStringNow(globalStartTime)
                 + ".txt";
+
         MTools.println("path: " + path);
         MTools.init(path, false);
 
@@ -320,7 +321,7 @@ public class SimulatorCore implements IRunner {
 
         MTools.println();
 
-//        startAllSimulations();
+        startAllSimulations();
     }
 }
 
