@@ -50,7 +50,7 @@ public class Util {
         String ms = fillMilli(mMil);
 
         String f = "";//""[hh:mm:ss:ms] ";
-        return f + sh + ":" + sm + ":" + ss + ":" + ms;
+        return f + sh + "." + sm + "." + ss + "." + ms;
     }
 
     static String getDateString(long millis) {
@@ -61,7 +61,7 @@ public class Util {
         int mMonth = calendar.get(Calendar.MONTH) + 1; // ONLY month count from 0
         int mDay = calendar.get(Calendar.DAY_OF_MONTH);
 
-        return mYear + ":" + Util.fill(mMonth) + ":" + Util.fill(mDay);
+        return mYear + "." + Util.fill(mMonth) + "." + Util.fill(mDay);
     }
 
     private static String fillMilli(int s) {

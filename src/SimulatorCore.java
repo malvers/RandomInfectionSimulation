@@ -239,7 +239,7 @@ public class SimulatorCore implements IRunner {
                 + " - ready: " + getEstimateReadyDateAndTime(timeToGo));
 
         grapher.calcAverageInfectionCurve();
-        grapher.writeData(System.getProperty("user.home") + "/CoronaSimulationData");
+        grapher.writeData(System.getProperty("user.home") + "\\CoronaSimulationData");
     }
 
     private static void startAllSimulations() {
@@ -280,9 +280,9 @@ public class SimulatorCore implements IRunner {
 
         long estimate = calculateEstimate();
 
-        String path = System.getProperty("user.home") + "/CoronaSimulationData/Simulation protocol "
+        String path = System.getProperty("user.home") + "\\CoronaSimulationData\\Simulation_protocol "
                 + Util.getDateString(globalStartTime)
-                + "-" + Util.getTimeStringNow(globalStartTime) + ".txt";
+              + "-" + Util.getTimeStringNow(globalStartTime) + ".txt";
         MTools.println(path);
         MTools.init(path, false);
 
