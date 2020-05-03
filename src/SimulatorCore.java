@@ -296,7 +296,7 @@ public class SimulatorCore implements IRunner {
         averageSimusPerSecond = 0.0;
         averageSimusCounter = 0;
 
-        numThreads = 10;
+        numThreads = 3;
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
         PlayGround.numSimulations = 1;
 

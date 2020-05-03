@@ -155,7 +155,7 @@ public class Grapher extends JPanel {
             pw.write("//  qt - quarantine time:        " + PlayGround.quarantineTime + "\n");
             pw.write("//  sf - scale factor:           " + PlayGround.scale + "\n");
             pw.write("//  following two lines: 1. cw + 1 for average 2. maximal number steps\n");
-            pw.write("//  format below: cw * infected, immune, susceptible\n");
+            pw.write("//  format below: number simulations [ns] three-block-columns á infected, immune, susceptible - last column: average\n");
 
             pw.write(SimulatorCore.numThreads * PlayGround.numSimulations + 1 + "\n");
             pw.write((max + 1) + "\n");
