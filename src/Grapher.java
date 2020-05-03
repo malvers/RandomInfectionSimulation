@@ -25,6 +25,15 @@ public class Grapher extends JPanel {
 
     public void add(ArrayList<Distribution> d) {
 
+        if (allDistributions == null) {
+            allDistributions = new ArrayList<>();
+        }
+
+        if( d == null ) {
+            MTools.println( "[" + getClass() + "]->add d:" + d);
+            return;
+        }
+
         allDistributions.add(d);
         if (d.size() > maxGeneration) {
             maxGeneration = d.size();
