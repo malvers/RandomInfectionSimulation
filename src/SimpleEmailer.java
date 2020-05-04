@@ -29,7 +29,7 @@ public class SimpleEmailer {
     public synchronized final String sendEmail(String sSmtpServer,
                                                String sFromAdr, String sFromRealName,
                                                String sToAdr, String sToRealName,
-                                               String sSubject, String sText)
+                                               String sSubject, String sMessage)
             throws IOException, Exception {
         Socket so = null;
         try {
@@ -37,7 +37,7 @@ public class SimpleEmailer {
             if (null == sSmtpServer || 0 >= sSmtpServer.length() || null == sFromAdr || 0 >= sFromAdr.length() ||
                     null == sToAdr || 0 >= sToAdr.length() ||
                     ((null == sSubject || 0 >= sSubject.length())
-                            && (null == sText || 0 >= sText.length()))) {
+                            && (null == sMessage || 0 >= sMessage.length()))) {
                 throw new Exception("Invalid Parameters for SmtpSimple.sendEmail().");
             }
             if (null == sFromRealName || 0 >= sFromRealName.length()) {
@@ -62,7 +62,7 @@ public class SimpleEmailer {
             writeRead(false, null, "Mime-Version: 1.0\n");
             writeRead(false, null, "Content-Type: text/plain; charset=\"iso-8859-1\"\n");
             writeRead(false, null, "Content-Transfer-Encoding: quoted-printable\n\n");
-            writeRead(false, null, sText + "\n");
+            writeRead(false, null, sMessage + "\n");
             writeRead(true, "250", ".\n");
             writeRead(true, "221", "QUIT\n");
             return sRt;

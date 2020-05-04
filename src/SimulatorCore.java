@@ -29,7 +29,7 @@ public class SimulatorCore implements IRunner {
     private static String[] parameterNames;
     private static double averageSimusPerSecond = 0.0;
     private static int averageSimusCounter = 0;
-//    private long duration;
+    private static int totalCombinationCount = 0;
 
     /// constructor
     public SimulatorCore(String name) {
@@ -40,23 +40,30 @@ public class SimulatorCore implements IRunner {
         start(Long.MAX_VALUE);
     }
 
-    private static void printParameterVariations() {
+    private static String printParameterVariations() {
 
-        MTools.println();
+        String sThread = " threads.";
+        if( numThreads == 1 ) sThread = " thread.";
 
-        MTools.println("These " + numParameterVaried +
-                " parameters are varied in " +
-                numParameterVariationSettings +
-                " settings - number of all variation combinations: " +
-                Combinizer.getNumberAllVariations());
+        String msg = "These " + numParameterVaried +
+                " parameters are varied in " + numParameterVariationSettings +
+                " settings each. The number of all variation combinationsis " + Combinizer.getNumberAllVariations() +
+                " resulting in a total number of " + totalNumSimulations +
+                " simulations distributed on " + numThreads + sThread;
+
+        MTools.println(msg);
 
         for (int n = 0; n < parameterVariations.length; n++) {
-            MTools.print(parameterNames[n]);
+            MTools.print((n + 1) + " " + parameterNames[n]);
+            msg += "\n" + (n + 1) + " " + parameterNames[n];
             for (int col = 0; col < parameterVariations[n].length; col++) {
+                msg += Util.myFormatter(parameterVariations[n][col], 8, 2);
                 MTools.print(Util.myFormatter(parameterVariations[n][col], 8, 2));
             }
             MTools.println("");
         }
+        MTools.println();
+        return msg;
     }
 
     private static void createGeneralVariations(int r, int c) {
@@ -214,15 +221,18 @@ public class SimulatorCore implements IRunner {
     }
 
     private void sendReadyEmail() {
-        SimpleEmailer emailer = new SimpleEmailer();
-        String message = "Ready at: " + Util.getTimeStringNow(System.currentTimeMillis());
+
+        String message = "Ready at: " + Util.getTimeStringNow(System.currentTimeMillis())  + "\n\n";
+        message += printParameterVariations();
         try {
+            SimpleEmailer emailer = new SimpleEmailer();
             emailer.sendEmail("cloud.transinsight.com",
                     "malvers@transinsight.com", "Dr. Michael R. Alvers",
                     "malvers@transinsight.com", "Dr. Michael R. Alvers",
-                    "Message " + getClass(), message);
+                    "Message from: " + getClass(),
+                    message);
         } catch (Exception e) {
-            e.printStackTrace();
+            MTools.println( getClass() + " problems sending email ..." );
         }
     }
 
@@ -233,11 +243,14 @@ public class SimulatorCore implements IRunner {
                 + " [runtime (d:hh:mm:ss) " + Util.millisToTimeString(estimate) + "]";
     }
 
-    private static void printTimeNow() {
+    private static void printTimeNowAndEstimate() {
 
         MTools.println("Date & time now:                "
                 + Util.getDateString(System.currentTimeMillis())
                 + " + " + Util.getTimeStringNow(System.currentTimeMillis()));
+
+        MTools.println("Ready at date & time estimate:  " + getEstimateReadyDateAndTime(calculateEstimate()));
+        MTools.println("");
     }
 
     private void printAndWriteProgress() {
@@ -256,13 +269,15 @@ public class SimulatorCore implements IRunner {
         int toGo = totalNumSimulations - totalSimulationCount;
         long timeToGo = (long) (toGo / simusPerMilliSecond);
 
-        MTools.println(Util.getDateString(System.currentTimeMillis())
-                + " + " + Util.getTimeStringNow(System.currentTimeMillis())
-                + " - " + Util.myFormatter(totalSimulationCount, tns.length())
-                + " | togo: " + Util.myFormatter(toGo, tns.length())
-                + " | elapsed: " + sDuration
-                + " | simus/s " + Util.myFormatter(1000 * simusPerMilliSecond, 5, 2)
-                + " - ready: " + getEstimateReadyDateAndTime(timeToGo));
+        String str = "" + totalNumSimulations;
+        MTools.println(Util.myFormatter(++totalCombinationCount, str.length()) +
+                ". " + Util.getDateString(System.currentTimeMillis()) +
+                " + " + Util.getTimeStringNow(System.currentTimeMillis()) +
+                " - " + Util.myFormatter(totalSimulationCount, tns.length()) +
+                " | togo: " + Util.myFormatter(toGo, tns.length()) +
+                " | elapsed: " + sDuration +
+                " | simus/s " + Util.myFormatter(1000 * simusPerMilliSecond, 5, 2) +
+                " - ready: " + getEstimateReadyDateAndTime(timeToGo));
 
         grapher.calcAverageInfectionCurve();
         grapher.writeData(System.getProperty("user.home") + File.separator + "CoronaSimulationData");
@@ -289,23 +304,11 @@ public class SimulatorCore implements IRunner {
         return 1000 * (long) ((double) totalNumSimulations / (double) experience);
     }
 
-    /// main for running
-    public static void main(String[] args) throws FileNotFoundException {
-
+    private static void setStartTime() {
         globalStartTime = System.currentTimeMillis();
-        averageSimusPerSecond = 0.0;
-        averageSimusCounter = 0;
+    }
 
-        numThreads = 3;
-        /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
-        PlayGround.numSimulations = 1;
-
-        numParameterVariationSettings = 2;
-        createParameterVariations(numParameterVariationSettings);
-        createGeneralVariations(numParameterVaried, numParameterVariationSettings);
-
-        long estimate = calculateEstimate();
-
+    private static void initProtocol() {
         String path = System.getProperty("user.home")
                 + File.separator + "CoronaSimulationData"
                 + File.separator + "simulation protocol "
@@ -313,19 +316,36 @@ public class SimulatorCore implements IRunner {
                 + "-" + Util.getTimeStringNow(globalStartTime)
                 + ".txt";
 
-        MTools.println("path: " + path);
         MTools.init(path, false);
+    }
 
-        MTools.println("Total number of simulations:    " + totalNumSimulations);
+    private static void printHeader() {
+        MTools.println("");
+        MTools.println("RANDOM INFECTION SIMULATION ...");
+        MTools.println("");
+    }
+
+    /// main for running
+    public static void main(String[] args) throws FileNotFoundException {
+
+        printHeader();
+
+        setStartTime();
+
+        /// parameter settings //////////////////////////
+        numThreads = 10;
+        /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
+        PlayGround.numSimulations = 1;
+        numParameterVariationSettings = 2;
+        createParameterVariations(numParameterVariationSettings);
+        createGeneralVariations(numParameterVaried, numParameterVariationSettings);
+
+        /// init and print data ...
+        initProtocol();
+        printTimeNowAndEstimate();
         printParameterVariations();
 
-        MTools.println();
-        printTimeNow();
-
-        MTools.println("Ready at date & time estimate:  " + getEstimateReadyDateAndTime(estimate));
-
-        MTools.println();
-
+        /// and go ...
         startAllSimulations();
     }
 }

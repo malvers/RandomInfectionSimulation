@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class Plotter extends JPanel {
+
+    private boolean curves = false;
+    private boolean dragging = false;
 
     class MinMaxCo {
 
@@ -43,11 +47,20 @@ public class Plotter extends JPanel {
 
         files = listFiles();
 
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+                dragging = false;
+            }
+        });
+
         addMouseMotionListener(new MouseAdapter() {
 
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
+                dragging = true;
                 dragPosition = e.getX();
                 repaint();
             }
@@ -100,7 +113,7 @@ public class Plotter extends JPanel {
             if (listOfFiles[i].isFile()) {
 
                 String name = pathToData + File.separator + listOfFiles[i].getName();
-                if (name.endsWith(".simu") && name.contains("ns 1000")) {
+                if (name.endsWith(".simu") && name.contains("ns 3")) {
                     files.add(name);
 //                    MTools.println(i + " name: " + name);
                 }
@@ -152,9 +165,8 @@ public class Plotter extends JPanel {
                 data[lineCount][di++] = Double.parseDouble(tok.nextToken());
             }
         }
-        MTools.println( "done read ..." );
         calculateMinMax();
-        MTools.println( "done read ..." );
+        MTools.println("done read ...");
     }
 
     void calculateMinMax() {
@@ -176,13 +188,14 @@ public class Plotter extends JPanel {
             for (int j = 0; j < numberCurves - 1; j++) {
 
                 double infected = data[i][di++];
-                double immune = data[i][di++];      // skip unused by ++
-                double susceptible = data[i][di++]; // skip unused by ++
+                double immune = data[i][di++];
+                double susceptible = data[i][di++];
 
                 if (infected < 0) {
                     continue;
                 }
-
+                double delta = average - infected;
+                minmaco.var += (delta) * (delta);
                 if (infected < min) {
                     min = infected;
                 }
@@ -198,15 +211,13 @@ public class Plotter extends JPanel {
                     maxCount++;
                 }
             }
+            minmaco.var /= numberCurves - 1;
+//            MTools.println("var: " + minmaco.var);
+            minmaco.average = average;
             minmaco.min = min;
             minmaco.max = max;
             minmaco.minAv /= minCount;
             minmaco.maxAv /= maxCount;
-
-//            MTools.println(i +
-//                    " min: " + Util.myFormatter(minMax[i][0], 6, 4) +
-//                    " av: " + Util.myFormatter(average, 6, 4) +
-//                    " max: " + Util.myFormatter(minMax[i][1], 6, 4));
         }
     }
 
@@ -230,18 +241,18 @@ public class Plotter extends JPanel {
 
             int di = 0;
             double average = data[i][(numberCurves - 1) * 3];
-            for (int j = 0; j < numberCurves; j++) {
+            for (int j = 0; j < numberCurves-1; j++) {
 
                 double infected = data[i][di++];
                 double immune = data[i][di++];
                 double susceptible = data[i][di++];
 
-//                if (infected < 0) {
-//                    continue;
-//                }
-//                if (j < numberCurves - 1) {
-//                    continue;
-//                }
+                if (infected < 0) {
+                    continue;
+                }
+                if (!curves && j < numberCurves - 1) {
+                    continue;
+                }
 
                 g2d.setColor(Color.LIGHT_GRAY);
                 if (j == numberCurves - 1) {
@@ -259,34 +270,60 @@ public class Plotter extends JPanel {
 //                g2d.fill(new Rectangle.Double(x, getHeight() - y, 1.6, 1.6));
             }
         }
-        drawMinMax(g2d, factor);
+        drawMinMaxCo(g2d, factor);
 
-//        handleDrag(g2d, factor);
+        handleDrag(g2d, factor);
     }
 
-    private void drawMinMax(Graphics2D g2d, double factor) {
+    private void drawMinMaxCo(Graphics2D g2d, double factor) {
 
-        double y;
-        for (int i = 0; i < minMaxCo.size(); i++) {
-            MinMaxCo mimaco = minMaxCo.get(i);
-            double x = i * factor;
-            y = mimaco.minAv * getHeight();
+        int height = getHeight();
+        double y1, y2;
+        for (int i = 0; i < minMaxCo.size() - 1; i++) {
+
+            MinMaxCo mimaco1 = minMaxCo.get(i);
+            MinMaxCo mimaco2 = minMaxCo.get(i + 1);
+            double x1 = i * factor;
+            double x2 = (i + 1) * factor;
+            y1 = mimaco1.minAv * height;
+            y2 = mimaco2.minAv * getHeight();
             g2d.setColor(Color.BLUE.darker());
-            g2d.fill(new Rectangle.Double(x, getHeight() - y, 1.6, 1.6));
-            y = mimaco.maxAv * getHeight();
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
+            y1 = mimaco1.maxAv * getHeight();
+            y2 = mimaco2.maxAv * getHeight();
             g2d.setColor(Color.GREEN.darker());
-            g2d.fill(new Rectangle.Double(x, getHeight() - y, 1.6, 1.6));
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
 
-            y = mimaco.min * getHeight();
+            y1 = mimaco1.min * getHeight();
+            y2 = mimaco2.min * getHeight();
             g2d.setColor(Color.BLUE);
-            g2d.fill(new Rectangle.Double(x, getHeight() - y, 1.6, 1.6));
-            y = mimaco.max * getHeight();
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
+            y1 = mimaco1.max * getHeight();
+            y2 = mimaco2.max * getHeight();
             g2d.setColor(Color.GREEN);
-            g2d.fill(new Rectangle.Double(x, getHeight() - y, 1.6, 1.6));
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
+
+            y1 = (mimaco1.var) * height * 40;
+            y2 = (mimaco2.var) * height * 40;
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
+
+            y1 = (mimaco1.average) * height;
+            y2 = (mimaco2.average) * height;
+            g2d.setColor(Color.RED);
+            g2d.draw(new Line2D.Double(x1, height - y1, x2, height - y2));
+//            g2d.fill(new Rectangle.Double(x1, height - y1, 1.6, 1.6));
         }
     }
 
     private void handleDrag(Graphics2D g2d, double factor) {
+
+        if( !dragging ) return;
 
         g2d.setColor(Color.RED);
         g2d.drawLine(dragPosition, 0, dragPosition, getHeight());
