@@ -328,6 +328,8 @@ public class SimulatorCore implements IRunner {
     /// main for running
     public static void main(String[] args) throws FileNotFoundException {
 
+        initProtocol();
+
         printHeader();
 
         setStartTime();
@@ -340,15 +342,25 @@ public class SimulatorCore implements IRunner {
         createParameterVariations(numParameterVariationSettings);
         createGeneralVariations(numParameterVaried, numParameterVariationSettings);
 
-        /// init and print data ...
-        initProtocol();
         printTimeNowAndEstimate();
+
         printParameterVariations();
 
         /// and go ...
         startAllSimulations();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
