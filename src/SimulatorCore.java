@@ -47,7 +47,7 @@ public class SimulatorCore implements IRunner {
 
         String msg = "These " + numParameterVaried +
                 " parameters are varied in " + numParameterVariationSettings +
-                " settings each. The number of all variation combinationsis " + Combinizer.getNumberAllVariations() +
+                " settings each. The number of all variation-combinations is " + Combinizer.getNumberAllVariations() +
                 " resulting in a total number of " + totalNumSimulations +
                 " simulations distributed on " + numThreads + sThread;
 
@@ -338,7 +338,7 @@ public class SimulatorCore implements IRunner {
         numThreads = 10;
         /// take PlayGround.numSimulations times numThreads to get the total number of runs !!!
         PlayGround.numSimulations = 1;
-        numParameterVariationSettings = 2;
+        numParameterVariationSettings = 3;
         createParameterVariations(numParameterVariationSettings);
         createGeneralVariations(numParameterVaried, numParameterVariationSettings);
 

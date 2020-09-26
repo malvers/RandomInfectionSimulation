@@ -5,6 +5,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+
+interface SliderPanelListener {
+
+    void event(MouseEvent e);
+}
 
 class MSlider extends JPanel {
 
@@ -60,6 +67,7 @@ class MSlider extends JPanel {
                 double v = posToVal(e.getX());
                 if ((v % increment) < (increment / 20.0)) {
                     value = (int) (v / increment) * increment;
+                    informInterested(e);
                 }
                 if (value > max) {
                     value = max;
@@ -120,13 +128,14 @@ class MSlider extends JPanel {
         if (isDouble) {
             g2d.drawString("" + min, (float) (pMin - 6 * thickness - 2), (float) yPos + 30.0f);
             g2d.drawString("" + max, (float) pMax, (float) yPos + 30.0f);
+            float sw = (float) g2d.getFontMetrics().getStringBounds(label + " [" + value + "]", g2d).getWidth() / 2.0f;
+            g2d.drawString(label + " [" + value + "]", (float) (getWidth() / 2.0f - sw), (float) yPos - 15.0f);
         } else {
             g2d.drawString("" + (int) min, (float) (pMin - 6 * thickness - 2), (float) yPos + 30.0f);
             g2d.drawString("" + (int) max, (float) pMax, (float) yPos + 30.0f);
+            float sw = (float) g2d.getFontMetrics().getStringBounds(label + " [" + (int) value + "]", g2d).getWidth() / 2.0f;
+            g2d.drawString(label + " [" + (int) value + "]", (float) (getWidth() / 2.0f - sw), (float) yPos - 15.0f);
         }
-
-        float sw = (float) g2d.getFontMetrics().getStringBounds(label, g2d).getWidth() / 2.0f;
-        g2d.drawString(label, (float) (getWidth() / 2.0f - sw), (float) yPos - 15.0f);
     }
 
     private double valToPos(double val) {
@@ -139,5 +148,24 @@ class MSlider extends JPanel {
         double m = (max - min) / (pMax - pMin);
         double n = min - m * pMin;
         return m * val + n;
+    }
+
+    private List<SliderPanelListener> listeners = new ArrayList<>();
+
+    public void addListener(SliderPanelListener toAdd) {
+        listeners.add(toAdd);
+    }
+
+    public void informInterested(MouseEvent e) {
+        for (SliderPanelListener hl : listeners)
+            hl.event(e);
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

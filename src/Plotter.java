@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 
 public class Plotter extends JPanel {
 
-    private boolean curves = false;
+    private boolean drawCurves = false;
     private boolean dragging = false;
 
     class MinMaxCo {
@@ -69,22 +69,32 @@ public class Plotter extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
+
                 if (e.getKeyCode() == KeyEvent.VK_UP) {
                     incSelectedFileId();
+                    readAndRepaint();
                 }
-                if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     decSelectedFileId();
+                    readAndRepaint();
                 }
-                try {
-                    readData(files.get(selectedFileId));
+                else if (e.getKeyCode() == KeyEvent.VK_C) {
+                    drawCurves = !drawCurves;
                     repaint();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
                 }
             }
         });
 
-        readData("/Users/malvers/CoronaSimulationData/ns 1000 in 400 rt 700 ip 100.00[%] ws 160.0 is 5.0 qp  1.00[%] qt 200 sf 1.0.simu");
+        readData("/Users/malvers/CoronaSimulationData/ns 10 in 400 rt 700 ip 100.00[%] ws 160.0 is 5.0 qp  1.00[%] qt 200 sf 1.0.simu");
+    }
+
+    private void readAndRepaint() {
+        try {
+            readData(files.get(selectedFileId));
+            repaint();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 
     private void decSelectedFileId() {
@@ -122,10 +132,10 @@ public class Plotter extends JPanel {
         return files;
     }
 
-    private void readData(String name) throws IOException {
+    void readData(String name) throws IOException {
 
         f.setTitle(name);
-        MTools.println("read: " + name);
+//        MTools.println("read: " + name);
 
         minMaxCo = new ArrayList<MinMaxCo>();
 
@@ -166,7 +176,7 @@ public class Plotter extends JPanel {
             }
         }
         calculateMinMax();
-        MTools.println("done read ...");
+        repaint();
     }
 
     void calculateMinMax() {
@@ -250,7 +260,7 @@ public class Plotter extends JPanel {
                 if (infected < 0) {
                     continue;
                 }
-                if (!curves && j < numberCurves - 1) {
+                if (!drawCurves && j < numberCurves - 1) {
                     continue;
                 }
 
@@ -369,8 +379,12 @@ public class Plotter extends JPanel {
 
     public static void main(String[] args) throws IOException {
         f = new JFrame();
-        f.add(new Plotter());
-        f.setBounds(10, 10, 800, 600);
+        f.setLayout(new BorderLayout());
+        Plotter plotter = new Plotter();
+        SliderPanel sliderPanel = new SliderPanel(plotter);
+        f.add(BorderLayout.WEST, sliderPanel);
+        f.add(BorderLayout.CENTER, plotter);
+        f.setBounds(10, 10, 1440, 500);
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         f.setVisible(true);
     }
