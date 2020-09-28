@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class AllTasks extends ArrayList<MultiplicationTask> {
+public class AllTasks extends ArrayList<CalculationTask> {
 
     public AllTasks() {
         super(50);
