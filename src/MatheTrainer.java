@@ -26,16 +26,16 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 
     File[][] imagesMatrix = new File[10][10];
 
-    BufferedImage bgImage = null;
+    BufferedImage bgImg = null;
 
-    private final int fontSizeStatistics = 40;
+    private final int fontSizeStatistics = 30;
     private int numberTasksProSchueler = 6;
-    private int taskCounter = 0;
     private int colorSchemeId = 0;
     private int fontSizeNumbers = 220;
+    private int taskCounter = 0;
     private int iterationCount = 0;
 
-    private final float factorStatistics = 1.4f;
+    private final float factorDrawStatistics = 1.4f;
     private float transparency = 0.5f;
 
     private int actualKlasse = KlassenId.nineB;
@@ -56,6 +56,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
     private boolean drawSettings = false;
     private boolean limitedToSelectedSeries = false;
     private boolean debugMode = true;
+
     private int zeitProAufgabeUndSchueler;
     private int pinnedHighScore = 10000;
     private int countDownCounter = -1;
@@ -81,7 +82,32 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 
         initColors();
 
-        initNames();
+        initBeginning();
+
+    }
+
+    private void initBeginning() {
+
+        MTools.println("initBeginning:");
+
+        timeStartIsReseted = false;
+        beginning = true;
+        taskCounter = 0;
+        iterationCount = 0;
+        countDownCounter = -1;
+        penalty = 0;
+
+        showDuration = false;
+        drawStatistics = false;
+        shallWriteHighScore = false;
+        drawHelp = false;
+        drawSettings = false;
+
+        if (countDown != null) {
+            countDown.cancel();
+        }
+
+        initNames(true);
 
         initOperations();
 
@@ -103,13 +129,16 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         operation = Operations.divide;
     }
 
-    private void initNames() {
+    private void initNames(boolean shuffle) {
 
         alleKlassen.clear();
 
         new Klasse();
         for (int klassenId = 0; klassenId < Klasse.klassenString.length; klassenId++) {
             alleKlassen.add(new Klasse(klassenId));
+        }
+        if (shuffle) {
+            Collections.shuffle(alleKlassen.get(actualKlasse));
         }
     }
 
@@ -121,13 +150,13 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             Klasse klasse = alleKlassen.get(actualKlasse);
 
             for (int k = 0; k < klasse.size(); k++) {
+//                int choice = (int) (Math.random() * klasse.size());
                 if (!klasse.get(k).anwesend) {
                     continue;
                 }
                 allTasks.add(new CalculationTask(klasse.get(k).name, reihen, limitedToSelectedSeries, operation));
             }
         }
-        allTasks.print();
 
         if (shuffle) {
 
@@ -152,12 +181,8 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
                 }
             }
         }
-
-//        MTools.println("print alle Klassen");
-//        for (int i = 0; i < alleKlassen.size(); i++) {
-//            MTools.println("klasse: " + i);
-//            alleKlassen.get(i).print();
-//        }
+        Collections.shuffle(allTasks);
+        allTasks.checkForDoubleNames();
     }
 
     private void initColors() {
@@ -183,6 +208,8 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             os.writeInt(numberTasksProSchueler);
             os.writeFloat(transparency);
             os.writeBoolean(debugMode);
+            os.writeInt(fontSizeNumbers);
+//            os.writeInt(220);
 
             os.close();
             f.close();
@@ -195,7 +222,6 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 
         FileInputStream f;
         try {
-//            System.out.println("readSettings: " + settingsFileName);
             f = new FileInputStream(settingsFileName);
             ObjectInputStream in = new ObjectInputStream(f);
             int x = in.readInt();
@@ -205,8 +231,13 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             frame.setBounds(x, y, w, h);
             colorSchemeId = in.readInt();
             numberTasksProSchueler = in.readInt();
+            if (numberTasksProSchueler < 2) {
+                numberTasksProSchueler = 2;
+            }
             transparency = in.readFloat();
+            MTools.println("transparency: " + transparency);
             debugMode = in.readBoolean();
+            fontSizeNumbers = in.readInt();
 
             in.close();
             f.close();
@@ -234,32 +265,27 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         Graphics2D g2d = (Graphics2D) g;
 
         ColorSheme cs = allColorSchemes.get(colorSchemeId);
-        g2d.setColor(cs.backGround);
-        g2d.setColor(new Color(0.0f, 0.0f, 0.0f, transparency));
 
-        float scWidth = (float) this.getWidth() / (float) bgImage.getWidth();
-        float scHeight = (float) this.getHeight() / (float) bgImage.getHeight();
+        float scWidth = (float) this.getWidth() / (float) bgImg.getWidth();
+        float scHeight = (float) this.getHeight() / (float) bgImg.getHeight();
         if (scWidth < scHeight) {
-            g2d.drawImage(bgImage, 0, 0, (int) (bgImage.getWidth() * scHeight), (int) (bgImage.getHeight() * scHeight), this);
+            g2d.drawImage(bgImg, 0, 0, (int) (bgImg.getWidth() * scHeight), (int) (bgImg.getHeight() * scHeight), this);
         } else {
-            g2d.drawImage(bgImage, 0, 0, (int) (bgImage.getWidth() * scWidth), (int) (bgImage.getHeight() * scWidth), this);
+            g2d.drawImage(bgImg, 0, 0, (int) (bgImg.getWidth() * scWidth), (int) (bgImg.getHeight() * scWidth), this);
         }
 
         if (beginning) {
             g2d.setColor(ColorSheme.darkBlue);
             g2d.fillRect(0, 0, getWidth(), getHeight());
+        } else {
+            drawTransparentCover(g2d);
         }
-
-        g2d.fillRect(0, 0, getWidth(), getHeight());
 
         g2d.setColor(cs.fgLight);
         int yPos = getHeight() / 2;
         int xPos = getWidth() / 2;
 
         drawKlasseAndNumberTasks(g2d);
-
-        g2d.setColor(cs.fgDark);
-        g2d.setFont(new Font("Arial", Font.PLAIN, fontSizeNumbers));
 
         if (drawHelp) {
             g2d.setColor(ColorSheme.darkBlue);
@@ -269,8 +295,6 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         }
 
         if (drawSettings) {
-            g2d.setColor(ColorSheme.darkBlue);
-            g2d.fillRect(0, 0, getWidth(), getHeight());
             drawSettings(g2d, cs);
             return;
         }
@@ -290,25 +314,16 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             return;
         }
 
-
         drawAufgaben(g2d, cs, yPos, xPos);
 
         if (!beginning) {
             drawRunningTime(g2d, xPos, cs);
-        } else {
-            resetTimerStart();
-            timer = new Timer();
         }
-        drawDebugIndicator();
     }
 
-    private void drawDebugIndicator() {
-
-        if (debugMode) {
-            frame.setTitle("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG ");
-        } else {
-            frame.setTitle("TRAINING");
-        }
+    private void drawTransparentCover(Graphics2D g2d) {
+        g2d.setColor(new Color(0.0f, 0.0f, 0.0f, transparency));
+        g2d.fillRect(0, 0, getWidth(), getHeight());
     }
 
     private void drawKlasseAndNumberTasks(Graphics2D g2d) {
@@ -367,10 +382,10 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         g2d.setFont(new Font("Arial", Font.PLAIN, fontSizeStatistics));
         g2d.setColor(cs.fgDark);
 
-        int yShift = 30;
+        int yShift = 40;
         int xShift = 360;
         int i = 1;
-        float yPos = factorStatistics * fontSizeStatistics;
+        float yPos = factorDrawStatistics * fontSizeStatistics;
         g2d.drawString("H   ", 50, ((yShift + yPos * i)));
         g2d.drawString("Help", xShift, yShift + (yPos * i++));
 
@@ -411,9 +426,14 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         Rectangle2D bounds = metrics.getStringBounds(str, g2d);
         g2d.setColor(Color.GRAY);
         g2d.drawString(str, (float) (getWidth() / 2 - bounds.getWidth() / 2), getHeight() - 30);
+
+        drawKlasseAndNumberTasks(g2d);
     }
 
     private void drawSettings(Graphics2D g2d, ColorSheme cs) {
+
+        g2d.setColor(ColorSheme.darkBlue);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
 
         g2d.setFont(new Font("Arial", Font.PLAIN, fontSizeStatistics));
         g2d.setColor(cs.fgDark);
@@ -421,20 +441,22 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         int xIndent = 160;
         Color colorStore = g2d.getColor();
 
+        int yShift = 80;
         for (int i = 2; i < reihen.size(); i++) {
 
             g2d.setColor(colorStore);
-            int yShiftStatistics = 80;
 
             if (reihen.get(i)) {
-                g2d.drawString("✓  ", 50, yShiftStatistics + factorStatistics * fontSizeStatistics * (i - 2));
+                g2d.drawString("✓  ", 50, yShift + factorDrawStatistics * fontSizeStatistics * (i - 2));
             } else {
                 g2d.setColor(cs.fgLight);
             }
 
             String str = "er Reihe";
-            g2d.drawString("" + (i) + str, xIndent, yShiftStatistics + factorStatistics * fontSizeStatistics * (i - 2));
+            g2d.drawString("" + (i) + str, xIndent, yShift + factorDrawStatistics * fontSizeStatistics * (i - 2));
         }
+
+        drawKlasseAndNumberTasks(g2d);
     }
 
     private void drawStatistics(Graphics2D g2d, ColorSheme cs) {
@@ -447,12 +469,12 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 
         Klasse kl = alleKlassen.get(actualKlasse);
 
+        int yShift = 80;
         for (int i = 0; i < kl.size(); i++) {
 
             g2d.setColor(colorStore);
-            int yShiftStatistics = 80;
             if (kl.get(i).anwesend) {
-                g2d.drawString("✓  ", 50, yShiftStatistics + factorStatistics * fontSizeStatistics * i);
+                g2d.drawString("✓  ", 50, yShift + factorDrawStatistics * fontSizeStatistics * i);
             } else {
                 g2d.setColor(cs.fgLight);
             }
@@ -461,7 +483,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             if (name.contentEquals(pinnedName)) {
                 g2d.setColor(Color.RED);
             }
-            g2d.drawString(name, xIndent, yShiftStatistics + factorStatistics * fontSizeStatistics * i);
+            g2d.drawString(name, xIndent, yShift + factorDrawStatistics * fontSizeStatistics * i);
             int num = kl.get(i).getNumberTasks();
             String str = "" + num;
             if (num < 10) {
@@ -472,17 +494,20 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
                 continue;
             }
 
-            g2d.drawString(str, 500, yShiftStatistics + factorStatistics * fontSizeStatistics * i);
+            g2d.drawString(str, 500, yShift + factorDrawStatistics * fontSizeStatistics * i);
             num = kl.get(i).numberRightSolutions;
             str = "" + num;
             if (num < 10) {
                 str = "  " + str;
             }
-            g2d.drawString(str, 800, yShiftStatistics + factorStatistics * fontSizeStatistics * i);
+            g2d.drawString(str, 800, yShift + factorDrawStatistics * fontSizeStatistics * i);
         }
     }
 
     private void drawAufgaben(Graphics2D g2d, ColorSheme cs, int yPos, int xPos) {
+
+        g2d.setColor(cs.fgDark);
+        g2d.setFont(new Font("Arial", Font.PLAIN, fontSizeNumbers));
 
         int yShift = -60;
 
@@ -545,9 +570,9 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             if (ergebnis < 10) {
                 if (ergebnis == 1) {
                     res = task.number1 + sOperator + task.number2;
-                } else if( operation == Operations.divide){
+                } else if (operation == Operations.divide) {
                     res = task.number1 + sOperator + task.number2 + " = " + ergebnis;
-                } else  {
+                } else {
                     res = task.number1 + sOperator + task.number2 + " =   " + ergebnis;
                 }
             } else {
@@ -599,7 +624,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         sw = metrics.stringWidth(str);
         if (countDownCounter > -1) {
             int rw = 60;
-            g2d.setColor(cs.fgDark);
+            g2d.setColor(Color.GRAY);
             if (countDownCounter < 4) {
                 g2d.setColor(Color.ORANGE);
             }
@@ -647,7 +672,9 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         g2d.setFont(new Font("Arial", Font.PLAIN, fontSizeNumbers));
         metrics = g2d.getFontMetrics();
         String str = "・";
-        if( operation == Operations.divide ) str = " ÷ ";
+        if (operation == Operations.divide) {
+            str = " ÷ ";
+        }
         Rectangle2D bounds = metrics.getStringBounds("1" + str + "1", g2d);
         g2d.drawString("1" + str + "1", (float) (xPos - (bounds.getWidth() / 2.0)), (float) ((getHeight() / 2.0) + (bounds.getHeight() / 4.0f)));
 
@@ -700,7 +727,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         FontMetrics metrics;
         int sWidth;
 
-        String ttt = "Gesamtzeit für das Team [mm:ss]";
+        String ttt = "Gesamtzeit für das Team";
         g2d.setColor(cs.fgLight);
 
         if (penalty > 0) {
@@ -789,9 +816,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 
         double yPos = e.getY();
 
-        int id = (int) ((yPos - (fontSizeStatistics)) / (factorStatistics * fontSizeStatistics));
-
-        MTools.println("click count: " + e.getClickCount());
+        int id = (int) ((yPos - (fontSizeStatistics)) / (factorDrawStatistics * fontSizeStatistics));
 
         if (id >= alleKlassen.get(actualKlasse).size()) {
             return;
@@ -811,8 +836,11 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
                     try {
                         sc = new Scanner(new File(fileName));
                     } catch (FileNotFoundException fileNotFoundException) {
-//                        fileNotFoundException.printStackTrace();
+
+                        /// do nothing
+
                     } finally {
+
                         while (sc.hasNextLine()) {
                             String str = sc.nextLine();
                             pinnedHighScore = Integer.parseInt(str);
@@ -828,7 +856,9 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             }
 
         } else if (drawSettings) {
-            reihen.set(id + 2, !reihen.get(id + 2));
+            if (id + 2 < reihen.size()) {
+                reihen.set(id + 2, !reihen.get(id + 2));
+            }
         }
 
         initAllTasks(false);
@@ -859,31 +889,11 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        MTools.println("");
-        MTools.println("key: " + e.getKeyCode() + " shift: " + e.isShiftDown());
+//        MTools.println("key: " + e.getKeyCode() + " shift: " + e.isShiftDown());
 
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 
-            drawStatistics = false;
-            drawSettings = false;
-
-            initAllTasks(true);
-            resetTimerStart();
-
-            if (showDuration) {
-                iterationCount = 0;
-                taskCounter = 0;
-                beginning = true;
-                showDuration = false;
-            } else if (beginning) {
-                beginning = false;
-            }
-
-            try {
-                setImageForTask();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            handleEscape();
 
         } else if ((e.isShiftDown() && e.getKeyCode() == 48) || e.getKeyCode() == KeyEvent.VK_ENTER) {
 
@@ -907,7 +917,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             } else {
                 numberTasksProSchueler++;
                 //initNames();
-                initAllTasks(false);
+                initAllTasks(true);
             }
 
         } else if (e.getKeyCode() == 47) {
@@ -919,7 +929,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             } else {
                 numberTasksProSchueler--;
 //                initNames();
-                initAllTasks(false);
+                initAllTasks(true);
 
             }
 
@@ -937,7 +947,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         } else if (e.getKeyCode() == KeyEvent.VK_7) {
         } else if (e.getKeyCode() == KeyEvent.VK_8) {
             actualKlasse = KlassenId.eight;
-            initNames();
+            initNames(false);
             initAllTasks(true);
         } else if (e.getKeyCode() == KeyEvent.VK_9) {
             if (actualKlasse == KlassenId.nineA || actualKlasse == KlassenId.eight) {
@@ -945,7 +955,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             } else {
                 actualKlasse = KlassenId.nineA;
             }
-            initNames();
+            initNames(false);
             initAllTasks(true);
         } else if (e.getKeyCode() == KeyEvent.VK_0) {
         } else if (e.getKeyCode() == KeyEvent.VK_A) {
@@ -977,7 +987,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         } else if (e.getKeyCode() == KeyEvent.VK_M) {
 
             operation = Operations.multiply;
-            initAllTasks(true);
+            initAllTasks(false);
 
         } else if (e.getKeyCode() == KeyEvent.VK_P) {
         } else if (e.getKeyCode() == KeyEvent.VK_Q) {
@@ -986,7 +996,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             if (e.isShiftDown()) {
                 readImages();
             }
-            initNames();
+            initNames(false);
 
         } else if (e.getKeyCode() == KeyEvent.VK_S) {
 
@@ -1018,16 +1028,28 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         display();
     }
 
-    private void initBeginning() {
-        iterationCount = 0;
-        penalty = 0;
-        taskCounter = 0;
-        beginning = true;
-        showDuration = false;
-        countDownCounter = -1;
-        resetTimerStart();
-//        countDown = new MyCountDown(this);
-//        setCountDown(MyCountDown.countDownFrom);
+    private void handleEscape() {
+
+        drawStatistics = false;
+        drawSettings = false;
+
+        initAllTasks(true);
+        initNames(true);
+
+        if (showDuration) {
+            iterationCount = 0;
+            taskCounter = 0;
+            beginning = true;
+            showDuration = false;
+        } else if (beginning) {
+            beginning = false;
+        }
+
+        try {
+            setImageForTask();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private boolean handleDown() {
@@ -1053,7 +1075,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
 //                            MTools.println( "running:" );
                         repaint();
                     }
-                }, 0, 500);
+                }, 0, 100);
             }
             return true;
         }
@@ -1069,27 +1091,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             taskCounter++;
 
             if (taskCounter >= alleKlassen.get(actualKlasse).getNumberTasks()) {
-
-                showDuration = true;
-                taskCounter = numberTasksProSchueler;
-                finalDeltaT = deltaT;
-
-                int numSchueler = alleKlassen.get(actualKlasse).size();
-                int numTasks = numberTasksProSchueler * numSchueler;
-
-                long newHighScore = (long) ((double) finalDeltaT / (double) numTasks);
-
-//                MTools.println("numTasks:     " + numTasks + " newHigScore " + newHighScore);
-//                MTools.println("highScore:    " + alleKlassen.get(actualKlasse).highScore);
-//                MTools.println("newHighScore: " + newHighScore);
-
-                if (!debugMode && pinnedName.length() == 0 && newHighScore < alleKlassen.get(actualKlasse).highScore) {
-//                    MTools.println("better high score ...");
-                    alleKlassen.get(actualKlasse).highScore = newHighScore;
-                }
-                shallWriteHighScore = true;
-
-                timer.cancel();
+                handleFinished();
             }
 
             countDown = new MyCountDown(this);
@@ -1120,6 +1122,24 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         }
 
         return false;
+    }
+
+    private void handleFinished() {
+        showDuration = true;
+        taskCounter = numberTasksProSchueler;
+        finalDeltaT = deltaT;
+
+        int numSchueler = alleKlassen.get(actualKlasse).size();
+        int numTasks = numberTasksProSchueler * numSchueler;
+
+        long newHighScore = (long) ((double) finalDeltaT / (double) numTasks);
+
+        if (!debugMode && pinnedName.length() == 0 && newHighScore < alleKlassen.get(actualKlasse).highScore) {
+            alleKlassen.get(actualKlasse).highScore = newHighScore;
+        }
+        shallWriteHighScore = true;
+
+        timer.cancel();
     }
 
     private void handleWrong() {
@@ -1166,9 +1186,9 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         CalculationTask task = allTasks.get(taskCounter);
         if (operation == 0) {
             if (task.number1 > task.number2) {
-                bgImage = ImageIO.read(imagesMatrix[task.number2][task.number1]);
+                bgImg = ImageIO.read(imagesMatrix[task.number2][task.number1]);
             } else {
-                bgImage = ImageIO.read(imagesMatrix[task.number1][task.number2]);
+                bgImg = ImageIO.read(imagesMatrix[task.number1][task.number2]);
             }
         } else if (operation == 1) {
 
@@ -1176,9 +1196,9 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
             int ind2 = task.number2;
 
             if (ind1 > ind2) {
-                bgImage = ImageIO.read(imagesMatrix[ind2][ind1]);
+                bgImg = ImageIO.read(imagesMatrix[ind2][ind1]);
             } else {
-                bgImage = ImageIO.read(imagesMatrix[ind1][ind2]);
+                bgImg = ImageIO.read(imagesMatrix[ind1][ind2]);
             }
         }
     }
@@ -1203,7 +1223,7 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         }
 
         try {
-            bgImage = ImageIO.read(imagesMatrix[7][8]);
+            bgImg = ImageIO.read(imagesMatrix[7][8]);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1231,7 +1251,14 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
     public void keyReleased(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-//            MTools.println( "keyReleased ESC " );
+            MTools.println("keyReleased ESC ");
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    repaint();
+                }
+            }, 0, 100);
+            countDown = new MyCountDown(this);
         }
     }
 
@@ -1241,12 +1268,10 @@ public class MatheTrainer extends JPanel implements MouseListener, KeyListener {
         frame = new JFrame();
         frame.setLayout(new GridLayout());
         frame.setBounds(0, 0, 1280, 800);
-        MatheTrainer trainer = new MatheTrainer();
-        frame.add(trainer);
+        frame.add(new MatheTrainer());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //frame.setUndecorated(true);
+        frame.setUndecorated(true);
         frame.setVisible(true);
     }
-
 }

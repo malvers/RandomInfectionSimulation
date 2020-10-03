@@ -35,6 +35,6 @@ public class CalculationTask {
 
         String space = "";
         if( i < 10 ) space = " ";
-        MTools.println(space  + i + " -> " + number1 + sOperator + number2 + " = ");
+        MTools.println(name + " ->\t" + space  + i + " ->\t" + number1 + sOperator + number2 + " = ");
     }
 }

@@ -2,7 +2,7 @@ import java.util.Timer;
 
 public class MyCountDown extends Timer {
 
-    static int countDownFrom = 5;
+    static int countDownFrom = 9;
 
     public MyCountDown(MatheTrainer matheTrainer) {
         super();
