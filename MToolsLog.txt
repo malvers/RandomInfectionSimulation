@@ -1,3 +1,9 @@
-transparency: 0.8000001
+transparency: 0.6
 initBeginning:
-initBeginning:
+keyReleased ESC 
+transparency: 0.70000005
+transparency: 0.6
+transparency: 0.5
+transparency: 0.4
+keyReleased ESC 
+keyReleased ESC 
