@@ -59,6 +59,11 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     private int countDownCounter = -1;
     private int penalty = 0;
     private boolean shallWriteHighScore = false;
+    private boolean drawAufgabe = true;
+    private int nextTaskCountDownFrom = 4;
+    private int nextTaskCountDown = nextTaskCountDownFrom;
+    private int countDownFrom = 5;
+    private Timer nextTask;
 
     public MatheTrainer() {
 
@@ -103,10 +108,10 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             countDown.cancel();
         }
 
+        readImages();
+
         initNames(true);
         initAllTasks(true);
-
-        readImages();
 
         try {
             setImageForTask();
@@ -176,6 +181,13 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         }
         Collections.shuffle(allTasks);
         allTasks.checkForDoubleNames();
+
+        try {
+            setImageForTask();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
     }
 
     private void initColors() {
@@ -306,7 +318,9 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
         drawOperations(g2d, cs);
 
-        drawAufgaben(g2d, cs, yPos, xPos);
+        if (drawAufgabe) {
+            drawAufgaben(g2d, cs, yPos, xPos);
+        }
 
         if (!beginning) {
             drawRunningTime(g2d, xPos, cs);
@@ -637,7 +651,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         sw = metrics.stringWidth(str);
         if (countDownCounter > -1) {
             int rw = 60;
-            g2d.setColor(Color.GRAY);
+            g2d.setColor(Color.CYAN.darker());
             if (countDownCounter < 4) {
                 g2d.setColor(Color.ORANGE);
             }
@@ -1015,6 +1029,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             initAllTasks(true);
         } else if (e.getKeyCode() == KeyEvent.VK_0) {
         } else if (e.getKeyCode() == KeyEvent.VK_A) {
+            drawAufgabe = !drawAufgabe;
         } else if (e.getKeyCode() == KeyEvent.VK_B) {
             initBeginning();
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
@@ -1092,12 +1107,6 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         drawSettings = false;
         beginning = false;
         initAllTasks(true);
-
-        try {
-            setImageForTask();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     private boolean handleDown() {
@@ -1114,7 +1123,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             if (taskCounter == 0 && !timeStartIsReseted) {
 
                 MTools.println("start timer ... " + taskCounter);
-                countDown = new MyCountDown(this);
+                countDown = new MyCountDown(this, countDownFrom);
                 timeStartIsReseted = true;
                 resetTimerStart();
                 timer.scheduleAtFixedRate(new TimerTask() {
@@ -1132,6 +1141,8 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             return true;
         }
 
+        if( nextTask != null ) nextTask.cancel();
+
         iterationCount++;
 
         if (iterationCount % 2 > 0) {
@@ -1142,7 +1153,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
                 handleFinished();
             }
 
-            countDown = new MyCountDown(this);
+            countDown = new MyCountDown(this, countDownFrom);
 
             try {
                 setImageForTask();
@@ -1165,6 +1176,22 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             }
             if (countDown != null) {
                 countDown.cancel();
+                MTools.println("end of count down ...");
+                nextTask = new Timer();
+                nextTask.schedule(
+                        new TimerTask() {
+                            @Override
+                            public void run() {
+//                                MTools.println("run next task");
+                                nextTaskCountDown--;
+                                if (nextTaskCountDown == 0) {
+                                    nextTaskCountDown = nextTaskCountDownFrom;
+                                    this.cancel();
+                                    fireDown();
+                                }
+                            }
+                        }, 0, 1000
+                );
             }
             countDownCounter = -1;
         }
@@ -1173,6 +1200,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     }
 
     private void handleFinished() {
+
         showDuration = true;
         taskCounter = numberTasksProSchueler;
         finalDeltaT = deltaT;
@@ -1195,7 +1223,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         if (drawStatistics && drawSettings) {
             return;
         }
-        penalty += MyCountDown.countDownFrom;
+        penalty += countDownFrom;
         handleDown();
 
     }
@@ -1277,7 +1305,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         }
     }
 
-    public void fireNext() {
+    public void fireDown() {
         handleDown();
     }
 
@@ -1299,18 +1327,17 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     public void keyReleased(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            MTools.println("keyReleased ESC ");
             resetTimerStart();
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     repaint();
                 }
-            }, 0, 100);
+            }, 0, 1000);
             if (countDown != null) {
                 countDown.cancel();
             }
-            countDown = new MyCountDown(this);
+            countDown = new MyCountDown(this, countDownFrom);
         }
     }
 

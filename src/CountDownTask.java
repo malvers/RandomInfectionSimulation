@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 import java.util.TimerTask;
 
 public class CountDownTask extends TimerTask {
@@ -14,9 +12,7 @@ public class CountDownTask extends TimerTask {
 
     @Override
     public void run() {
-        if (counter == 0) {
-            matheTrainer.fireNext();
-        }
+        if (counter == 0) matheTrainer.fireDown();
         matheTrainer.setCountDown(counter);
         --counter;
     }
