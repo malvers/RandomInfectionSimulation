@@ -1,12 +1,60 @@
-transparency: 0.20000002
-initBeginning:
-start timer ... 0
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
-end of count down ...
+volume: NaN
+soundVolume: -1000.0
+soundVolume: -1000.0
+soundVolume: -1000.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.1
+volume: -20.0
+soundVolume: 0.2
+volume: -13.979401
+soundVolume: 0.3
+volume: -10.457574
+soundVolume: 0.4
+volume: -7.9588
+soundVolume: 0.5
+volume: -6.0206003
+soundVolume: 0.6
+volume: -4.4369745
+soundVolume: 0.70000005
+volume: -3.0980387
+soundVolume: 0.8000001
+volume: -1.9381995
+soundVolume: 0.8000001
+soundVolume: 0.8000001
+soundVolume: 0.8000001
+soundVolume: 0.8000001
+soundVolume: 0.70000005
+volume: -3.0980387
+soundVolume: 0.6
+volume: -4.4369745
+soundVolume: 0.5
+volume: -6.0206003
+soundVolume: 0.4
+volume: -7.9588
+soundVolume: 0.3
+volume: -10.457574
+soundVolume: 0.20000002
+volume: -13.979399
+soundVolume: 0.10000002
+volume: -19.999998
+soundVolume: 0.20000002
+volume: -13.979399
+soundVolume: 0.3
+volume: -10.457574
