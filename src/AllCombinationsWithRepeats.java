@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratool.System.out;
 
 import java.util.Arrays;
 
@@ -63,7 +63,7 @@ class AllCombinationsWithRepeats {
         String[] all = getAllCombinations(3);
 
         for (String string : allCombis) {
-            MTools.println(string);
+//            System.out.println(string);
         }
     }
 }

@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -99,7 +97,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
     private void initBeginning() {
 
-//        MTools.println("initBeginning:");
+//        System.out.println("initBeginning:");
 
         timeStartIsReseted = false;
         beginning = true;
@@ -377,7 +375,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         double hs = alleKlassen.get(actualKlasse).highScore / 1000.0;
 
         if (pinnedName.length() > 0) {
-            MTools.println(pinnedName + " pinned hs: " + pinnedHighScore);
+            System.out.println(pinnedName + " pinned hs: " + pinnedHighScore);
             hs = pinnedHighScore / 1000.0;
             zeitProAufgabeUndSchueler = pinnedHighScore;
         }
@@ -856,7 +854,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void mousePressed(MouseEvent e) {
 
-//        MTools.println("mousy");
+//        System.out.println("mousy");
 
         if (handleOperationSwitsching(e)) {
             return;
@@ -927,26 +925,26 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         int xStart = 0;
 
         if (xPos < xShift) {
-            MTools.println(" + ");
+            System.out.println(" + ");
             Operations.toggleOperationOnOff(Operations.plus);
             initAllTasks(true);
             repaint();
             return true;
         } else if (xPos > (xStart += xInc) && xPos < (xStart + xInc)) {
-            MTools.println(" - ");
+            System.out.println(" - ");
             Operations.toggleOperationOnOff(Operations.minus);
             initAllTasks(true);
             repaint();
             return true;
         } else if (xPos > (xStart += xInc) && xPos < (xStart + xInc)) {
-            MTools.println(" X ");
+            System.out.println(" X ");
             Operations.toggleOperationOnOff(Operations.multiply);
             initAllTasks(true);
             repaint();
             return true;
         } else if (xPos > (xStart += xInc) && xPos < (xStart + xInc)) {
             Operations.toggleOperationOnOff(Operations.divide);
-            MTools.println(" : ");
+            System.out.println(" : ");
             initAllTasks(true);
             repaint();
             return true;
@@ -977,7 +975,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void keyPressed(KeyEvent e) {
 
-//        MTools.println("key: " + e.getKeyCode() + " shift: " + e.isShiftDown());
+//        System.out.println("key: " + e.getKeyCode() + " shift: " + e.isShiftDown());
 
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 
@@ -1083,7 +1081,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
             playMusic = !playMusic;
 
-            MTools.println("M - soundVolume: " + soundVolume);
+            System.out.println("M - soundVolume: " + soundVolume);
 
             if (playMusic) {
                 gainControl.setValue(20f * (float) Math.log10(soundVolume));
@@ -1115,7 +1113,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             } else {
                 transparency += 0.1;
             }
-            MTools.println("transparency: " + transparency);
+            System.out.println("transparency: " + transparency);
 
         } else if (e.getKeyCode() == KeyEvent.VK_X) {
 
@@ -1141,7 +1139,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             if (soundVolume > 1.0f) {
                 soundVolume = 1.0f;
             }
-            MTools.println("soundVolume: " + soundVolume);
+            System.out.println("soundVolume: " + soundVolume);
 
             setVolume();
 
@@ -1150,13 +1148,13 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             for (int i = 0; i < 20; i++) {
                 int num1 = (int) (Math.random() * 8 + 2);
                 int num2 = (int) (Math.random() * 8 + 2);
-                MTools.println(num1 + " x " + num2 + " = ");
+                System.out.println(num1 + " x " + num2 + " = ");
             }
             for (int i = 0; i < 20; i++) {
                 int num1 = (int) (Math.random() * 8 + 2);
                 int num2 = (int) (Math.random() * 8 + 2);
                 num1 = num1 * num2;
-                MTools.println(num1 + " : " + num2 + " = ");
+                System.out.println(num1 + " : " + num2 + " = ");
             }
         }
 
@@ -1165,7 +1163,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
     private void handelExperimental() {
 
-        MTools.println("Xperimental ...");
+        System.out.println("Xperimental ...");
 
         if (clip.isOpen() || clip.isRunning()) {
             clip.stop();
@@ -1186,10 +1184,10 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             return;
         }
 
-        MTools.println("soundVolume: " + soundVolume);
+        System.out.println("soundVolume: " + soundVolume);
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         gainControl.setValue(20f * (float) Math.log10(soundVolume));
-        MTools.println("setVolume() - volume: " + gainControl.getValue());
+        System.out.println("setVolume() - volume: " + gainControl.getValue());
     }
 
     private void handleEscape() {
@@ -1213,14 +1211,14 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
             if (taskCounter == 0 && !timeStartIsReseted) {
 
-//                MTools.println("start timer ... " + taskCounter);
+//                System.out.println("start timer ... " + taskCounter);
                 countDown = new MyCountDown(this, countDownFrom);
                 timeStartIsReseted = true;
                 resetTimerStart();
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-//                        MTools.println( "running:" );
+//                        System.out.println( "running:" );
                         repaint();
                     }
                 }, 0, 200);
@@ -1329,7 +1327,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             return;
         }
 
-        MTools.println("write high score Klasse: " + Klasse.klassenString[actualKlasse]);
+        System.out.println("write high score Klasse: " + Klasse.klassenString[actualKlasse]);
 
         if (pinnedName.length() > 0) {
 
@@ -1384,7 +1382,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             for (int j = 0; j < 10; j++) {
                 imagesMatrix[i][j] = listOfFiles[counter];
 
-//                MTools.println(i + " - " + j + " name: " + listOfFiles[counter].getName());
+//                System.out.println(i + " - " + j + " name: " + listOfFiles[counter].getName());
 
                 counter++;
                 if (counter > listOfFiles.length) {
@@ -1459,7 +1457,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
         String name = "sound/" + schueler + "_de-DE" + gender + ".wav";
 
-        MTools.println("Playing sound: " + name);
+        System.out.println("Playing sound: " + name);
 
         setAndPlaySound(name);
     }
@@ -1486,7 +1484,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            MTools.println( "file not found: " + name);
+            System.out.println( "file not found: " + name);
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }

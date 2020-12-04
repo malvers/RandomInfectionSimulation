@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratools.System.out;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,15 +47,15 @@ public class PrimeNumber {
 
             if (prime % 4 == 1) {
                 value = 1.0 + 1.0 / prime;
-                MTools.println(i + " + prime: " + prime + " value: " + value);
+                //System.out.println(i + " + prime: " + prime + " value: " + value);
             } else {
                 value = 1.0 - 1.0 / prime;
-                MTools.println(i + " - prime: " + prime + " value: " + value);
+                //System.out.println(i + " - prime: " + prime + " value: " + value);
             }
             result *= value;
 
         }
-        MTools.println("PI: " + (2.0 / result));
+        //System.out.println("PI: " + (2.0 / result));
     }
 }
 

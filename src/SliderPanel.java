@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -65,7 +63,7 @@ public class SliderPanel extends JPanel implements SliderPanelListener {
         try {
             plotter.readData(name);
         } catch (IOException ioException) {
-            MTools.println( ":-(   " + name );
+            System.out.println( ":-(   " + name );
         }
     }
 
@@ -92,7 +90,7 @@ public class SliderPanel extends JPanel implements SliderPanelListener {
             try {
                 plotter.readData(name);
             } catch (IOException ioException) {
-                MTools.println( ":-(   " + name );
+                System.out.println( ":-(   " + name );
             }
         }
     }

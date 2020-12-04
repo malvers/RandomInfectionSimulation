@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratools.System.out;
 
 import javax.swing.*;
 import java.awt.*;
@@ -125,7 +125,7 @@ public class Plotter extends JPanel {
                 String name = pathToData + File.separator + listOfFiles[i].getName();
                 if (name.endsWith(".simu") && name.contains("ns 3")) {
                     files.add(name);
-//                    MTools.println(i + " name: " + name);
+//                    System.out.println(i + " name: " + name);
                 }
             }
         }
@@ -135,7 +135,7 @@ public class Plotter extends JPanel {
     void readData(String name) throws IOException {
 
         f.setTitle(name);
-//        MTools.println("read: " + name);
+//        System.out.println("read: " + name);
 
         minMaxCo = new ArrayList<MinMaxCo>();
 
@@ -222,7 +222,7 @@ public class Plotter extends JPanel {
                 }
             }
             minmaco.var /= numberCurves - 1;
-//            MTools.println("var: " + minmaco.var);
+//            System.out.println("var: " + minmaco.var);
             minmaco.average = average;
             minmaco.min = min;
             minmaco.max = max;
@@ -344,7 +344,7 @@ public class Plotter extends JPanel {
         }
 
         int averagePosition = (numberCurves - 1) * 3;
-        MTools.println(pos + " av:  " + data[pos][averagePosition] + " nc: " + numberCurves);
+        //System.out.println(pos + " av:  " + data[pos][averagePosition] + " nc: " + numberCurves);
         double lav = 0.0;
         int di = 0;
         for (int j = 0; j < numberCurves - 1; j++) {
@@ -352,7 +352,7 @@ public class Plotter extends JPanel {
             lav += infected;
             di += 3;
         }
-        MTools.println("lav: " + lav / (double) (numberCurves - 1));
+        //System.out.println("lav: " + lav / (double) (numberCurves - 1));
     }
 
     private void drawGrid(Graphics2D g2d, double factor) {

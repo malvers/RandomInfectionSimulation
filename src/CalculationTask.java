@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratools.System.out;
 
 import java.awt.*;
 
@@ -54,7 +54,7 @@ public class CalculationTask {
         if (i < 10) {
             space = " ";
         }
-        MTools.println(name + " ->\t" + space + i + " ->\t" + number1 + sOperator + number2 + " = ");
+        System.out.println(name + " ->\t" + space + i + " ->\t" + number1 + sOperator + number2 + " = ");
     }
 
     public short getOperation() {

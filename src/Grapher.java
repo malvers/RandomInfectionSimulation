@@ -1,4 +1,3 @@
-import mratools.MTools;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,7 +29,7 @@ public class Grapher extends JPanel {
         }
 
         if( d == null ) {
-            MTools.println( "[" + getClass() + "]->add d:" + d);
+            System.out.println( "[" + getClass() + "]->add d:" + d);
             return;
         }
 
@@ -151,7 +150,7 @@ public class Grapher extends JPanel {
         try {
             pw = new PrintWriter(fileName);
 
-//            MTools.println( "writeData: " + fileName);
+//            System.out.println( "writeData: " + fileName);
 
             pw.write("// " + fileName + "\n");
             pw.write("//  ns - number simulations:     " + PlayGround.numSimulations * SimulatorCore.numThreads + "\n");

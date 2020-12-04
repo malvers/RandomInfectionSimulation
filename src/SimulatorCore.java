@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -51,18 +49,18 @@ public class SimulatorCore implements IRunner {
                 " resulting in a total number of " + totalNumSimulations +
                 " simulations distributed on " + numThreads + sThread;
 
-        MTools.println(msg);
+        System.out.println(msg);
 
         for (int n = 0; n < parameterVariations.length; n++) {
-            MTools.print((n + 1) + " " + parameterNames[n]);
+            System.out.print((n + 1) + " " + parameterNames[n]);
             msg += "\n" + (n + 1) + " " + parameterNames[n];
             for (int col = 0; col < parameterVariations[n].length; col++) {
                 msg += Util.myFormatter(parameterVariations[n][col], 8, 2);
-                MTools.print(Util.myFormatter(parameterVariations[n][col], 8, 2));
+                System.out.print(Util.myFormatter(parameterVariations[n][col], 8, 2));
             }
-            MTools.println("");
+            System.out.println("");
         }
-        MTools.println();
+        System.out.println();
         return msg;
     }
 
@@ -142,8 +140,8 @@ public class SimulatorCore implements IRunner {
 
     private static boolean setNextParameterVariation() {
 
-//        MTools.println("");
-//        MTools.println("/// next variation: " + actualVariation + " of " + variations.length);
+//        System.out.println("");
+//        System.out.println("/// next variation: " + actualVariation + " of " + variations.length);
 
         for (int paramVariation = 0; paramVariation < numParameterVaried; paramVariation++) {
 
@@ -169,7 +167,7 @@ public class SimulatorCore implements IRunner {
                 PlayGround.recoverTime = (int) value;
             }
 
-//            MTools.println(str + " paramVariation: " + paramVariation + " choice: " + choice + " value: " + value);
+//            System.out.println(str + " paramVariation: " + paramVariation + " choice: " + choice + " value: " + value);
         }
         actualVariation++;
 
@@ -212,7 +210,7 @@ public class SimulatorCore implements IRunner {
 
         if (setNextParameterVariation()) {
             double val = 1000 * (averageSimusPerSecond / (double) averageSimusCounter);
-            MTools.println("average simulations per second: " + Util.myFormatter(val, 5, 2));
+            System.out.println("average simulations per second: " + Util.myFormatter(val, 5, 2));
             sendReadyEmail();
             return; // all work is done
         }
@@ -232,7 +230,7 @@ public class SimulatorCore implements IRunner {
                     "Message from: " + getClass(),
                     message);
         } catch (Exception e) {
-            MTools.println( getClass() + " problems sending email ..." );
+            System.out.println( getClass() + " problems sending email ..." );
         }
     }
 
@@ -245,12 +243,12 @@ public class SimulatorCore implements IRunner {
 
     private static void printTimeNowAndEstimate() {
 
-        MTools.println("Date & time now:                "
+        System.out.println("Date & time now:                "
                 + Util.getDateString(System.currentTimeMillis())
                 + " + " + Util.getTimeStringNow(System.currentTimeMillis()));
 
-        MTools.println("Ready at date & time estimate:  " + getEstimateReadyDateAndTime(calculateEstimate()));
-        MTools.println("");
+        System.out.println("Ready at date & time estimate:  " + getEstimateReadyDateAndTime(calculateEstimate()));
+        System.out.println("");
     }
 
     private void printAndWriteProgress() {
@@ -270,7 +268,7 @@ public class SimulatorCore implements IRunner {
         long timeToGo = (long) (toGo / simusPerMilliSecond);
 
         String str = "" + totalNumSimulations;
-        MTools.println(Util.myFormatter(++totalCombinationCount, str.length()) +
+        System.out.println(Util.myFormatter(++totalCombinationCount, str.length()) +
                 ". " + Util.getDateString(System.currentTimeMillis()) +
                 " + " + Util.getTimeStringNow(System.currentTimeMillis()) +
                 " - " + Util.myFormatter(totalSimulationCount, tns.length()) +
@@ -284,7 +282,7 @@ public class SimulatorCore implements IRunner {
     }
 
     private static void startAllSimulations() {
-//        MTools.println( "start - num threads: "  + numThreads);
+//        System.out.println( "start - num threads: "  + numThreads);
         for (int i = 0; i < numThreads; i++) {
             String sThread = "" + i;
             if (i < 10) {
@@ -316,13 +314,13 @@ public class SimulatorCore implements IRunner {
                 + "-" + Util.getTimeStringNow(globalStartTime)
                 + ".txt";
 
-        MTools.init(path, false);
+        //System.out.init(path, false);
     }
 
     private static void printHeader() {
-        MTools.println("");
-        MTools.println("RANDOM INFECTION SIMULATION ...");
-        MTools.println("");
+        System.out.println("");
+        System.out.println("RANDOM INFECTION SIMULATION ...");
+        System.out.println("");
     }
 
     /// main for running

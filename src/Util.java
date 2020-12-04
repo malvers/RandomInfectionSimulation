@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -126,9 +124,9 @@ public class Util {
     public static void main(String[] args) {
 
         double v = 9.35;
-        MTools.println(myFormatter(v, 4, 2));
+        System.out.println(myFormatter(v, 4, 2));
 
-        MTools.println( myFormatter(100, 20) );
+        System.out.println( myFormatter(100, 20) );
     }
 }
 

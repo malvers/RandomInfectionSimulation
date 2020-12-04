@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratools.System.out;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -24,16 +24,16 @@ public class Combinizer {
     }
 
     private void printCombinations() {
-        MTools.println("Print combinations ...");
+        System.out.println("Print combinations ...");
         for (String str : allCombinations) {
-            MTools.println(str);
+            System.out.println(str);
         }
     }
 
     private void printPossibilities() {
-        MTools.println("Print possibilities ...");
+        System.out.println("Print possibilities ...");
         for (String str : allPossibilities) {
-            MTools.println(str);
+            System.out.println(str);
         }
     }
 
@@ -44,14 +44,14 @@ public class Combinizer {
 
         allCombinations = MyCombinationsWithRepeats.get(rows, cols);
 
-//        MTools.println("Create possibilities ...");
+//        System.out.println("Create possibilities ...");
         createPossibilities(cols);
 
 //        printPossibilities();
 //        printCombinations();
 
 
-//        MTools.println("Create variations ...");
+//        System.out.println("Create variations ...");
         variations = new String[allCombinations.length][rows];
 
         int combiCount = 0;
@@ -69,7 +69,7 @@ public class Combinizer {
 
     private void writeVariations() throws FileNotFoundException {
 
-//        MTools.println("Write variations ...");
+//        System.out.println("Write variations ...");
 
         PrintWriter pw = new PrintWriter(rows + " x " + cols + ".dat");
         pw.write("// rows: " + rows + " cols: " + cols + " number possibilities: " + allCombinations.length + "\n");
@@ -86,14 +86,14 @@ public class Combinizer {
 
     void printVariations() {
 
-        MTools.println("Print all " + variations.length + " variations ...");
+        System.out.println("Print all " + variations.length + " variations ...");
 
         for (String[] var : variations) {
 
             for (String string : var) {
-                MTools.println( string);
+                System.out.println( string);
             }
-            MTools.println( "" );
+            System.out.println( "" );
         }
     }
 

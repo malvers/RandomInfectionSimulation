@@ -1,5 +1,3 @@
-import mratools.MTools;
-
 public class OneSchueler {
 
     public int numberFalseSolutions;
@@ -28,6 +26,6 @@ public class OneSchueler {
     }
 
     public void print() {
-        MTools.println("name: " + name + " tasks: " + numberTasks);
+        System.out.println("name: " + name + " tasks: " + numberTasks);
     }
 }
