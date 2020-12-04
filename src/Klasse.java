@@ -56,10 +56,11 @@ public class Klasse extends ArrayList<OneSchueler> {
     }
 
     private void initKlassenId() {
-        klassenString = new String[3];
+        klassenString = new String[4];
         klassenString[0] = "9b";
         klassenString[1] = "9a";
         klassenString[2] = "8";
+        klassenString[3] = "7";
     }
 
     public Klasse() {

@@ -15,6 +15,9 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
     private static JFrame frame;
     private static Clip clip;
+    private final String sound1 = "sound/6 Minuten Jeopardy Theme Music 5%.wav";
+    private final String sound2 = "sound/Madonna - Frozen 10%.wav";
+    private String soundOnDisplay = sound1;
     private Timer timer;
     private MyCountDown countDown;
 
@@ -61,9 +64,9 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     private int penalty = 0;
     private boolean shallWriteHighScore = false;
     private boolean drawAufgabe = true;
-    private int nextTaskCountDownFrom = 4;
+    private int nextTaskCountDownFrom = 5;
+    private int countDownFrom = 9;
     private int nextTaskCountDown = nextTaskCountDownFrom;
-    private int countDownFrom = 5;
     private Timer nextTask;
     private float soundVolume = 1.0f;
     private boolean playMusic = true;
@@ -89,12 +92,7 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
         initBeginning();
 
-//        setAndPlaySound("sound/6 Minuten Jeopardy Theme Music 5%.wav");
-        setAndPlaySound("sound/Madonna - Frozen 10%.wav");
-
-        if (!playMusic) {
-            soundVolume = -1000;
-        }
+        setAndPlaySound(sound1);
 
         setVolume();
     }
@@ -1038,6 +1036,9 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
         } else if (e.getKeyCode() == KeyEvent.VK_5) {
         } else if (e.getKeyCode() == KeyEvent.VK_6) {
         } else if (e.getKeyCode() == KeyEvent.VK_7) {
+            actualKlasse = KlassenId.seven;
+            initNames(false);
+            initAllTasks(true);
         } else if (e.getKeyCode() == KeyEvent.VK_8) {
             actualKlasse = KlassenId.eight;
             initNames(false);
@@ -1082,12 +1083,12 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
 
             playMusic = !playMusic;
 
-            MTools.println("soundVolume: " + soundVolume);
+            MTools.println("M - soundVolume: " + soundVolume);
 
             if (playMusic) {
                 gainControl.setValue(20f * (float) Math.log10(soundVolume));
             } else {
-                gainControl.setValue(-1000);
+                gainControl.setValue(-100);
             }
 
         } else if (e.getKeyCode() == KeyEvent.VK_P) {
@@ -1163,20 +1164,32 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
     }
 
     private void handelExperimental() {
-        MTools.println("Xperimental");
+
+        MTools.println("Xperimental ...");
+
         if (clip.isOpen() || clip.isRunning()) {
-            MTools.println("x running:");
             clip.stop();
         }
-        setAndPlaySound("sound/Madonna - Frozen 10%.wav");
+
+        if (soundOnDisplay.contentEquals(sound1)) {
+            soundOnDisplay = sound2;
+            setAndPlaySound(soundOnDisplay);
+        } else {
+            soundOnDisplay = sound1;
+            setAndPlaySound(soundOnDisplay);
+        }
     }
 
     private void setVolume() {
 
-        if( clip == null ) return;
+        if (clip == null) {
+            return;
+        }
+
+        MTools.println("soundVolume: " + soundVolume);
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         gainControl.setValue(20f * (float) Math.log10(soundVolume));
-        MTools.println("volume: " + gainControl.getValue());
+        MTools.println("setVolume() - volume: " + gainControl.getValue());
     }
 
     private void handleEscape() {
@@ -1469,11 +1482,11 @@ public class MatheTrainer extends JPanel implements MouseListener, MouseMotionLi
             audioInputStream = AudioSystem.getAudioInputStream(new File(name).getAbsoluteFile());
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
-            clip.loop(10);
+//            clip.loop(10);
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            MTools.println( "file not found: " + name);
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
