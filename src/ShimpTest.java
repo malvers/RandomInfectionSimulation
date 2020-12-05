@@ -220,7 +220,10 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
             }
         }
 
-        if( clickedOn == -1 ) return;
+        if (clickedOn == -1) {
+            sequence = 0;
+            return;
+        }
 
         if (clickedOn == sequence) {
             System.out.println("correct: " + sequence + " clickedOn: " + clickedOn);
