@@ -35,6 +35,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     private long mouseIsDown = 0;
 
     JPopupMenu popupMenu;
+    private Point posOnPress;
 
     public ShimpTest() {
 
@@ -218,6 +219,8 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
         System.out.println("Pos x: " + e.getX() + " y: " + e.getY());
 
+        posOnPress = e.getPoint();
+
         popupMenu.setVisible(false);
 
         mouseIsDown = System.currentTimeMillis();
@@ -266,9 +269,18 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void mouseReleased(MouseEvent e) {
 
+        int dx = posOnPress.x - e.getX();
+        int dy = posOnPress.y - e.getY();
+
+        if( dy < 100 ) numNumbers--;
+        if( dy > 100 ) numNumbers++;
+
+        System.out.println("release - dx: " + dx + " dy: " + dy);
+
         if( System.currentTimeMillis() - mouseIsDown > 1000 ) {
             System.out.println( "BINGO!!!!!!" );
-            popupMenu.setLocation(e.getPoint());
+
+            popupMenu.setLocation(e.getLocationOnScreen());
             popupMenu.setVisible(true);
         }
     }
@@ -307,10 +319,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
             case 45:
             case 47:
-                numNumbers--;
-                if (numNumbers < 3) {
-                    numNumbers = 3;
-                }
+                decNumbers();
                 initShimpNumbers();
                 writeSettings();
                 repaint();
@@ -335,6 +344,13 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
                 fanfare = !fanfare;
                 repaint();
                 break;
+        }
+    }
+
+    private void decNumbers() {
+        numNumbers--;
+        if (numNumbers < 3) {
+            numNumbers = 3;
         }
     }
 
