@@ -1,4 +1,4 @@
-import mratools.MTools;
+//import mratools.MTools;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -81,7 +81,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
     private void initShimpNumbers() {
 
-        MTools.println("initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ ");
+        System.out.println("initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ ");
 
         isInit = true;
 
@@ -121,7 +121,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
             }
 
             if (sumDist > count * minDistInit && minDist > 170) {
-                MTools.println("whileCount: " + whileCount + " minDist: " + minDist + " count * minDistInit: " + (count * minDistInit) + " sumDist: " + sumDist);
+                System.out.println("whileCount: " + whileCount + " minDist: " + minDist + " count * minDistInit: " + (count * minDistInit) + " sumDist: " + sumDist);
                 break;
             }
         }
@@ -132,7 +132,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        MTools.println("Cover " + coverCount);
+                        System.out.println("Cover " + coverCount);
                         if (coverCount > 0) {
                             coverOn = true;
                             coverCount = 0;
@@ -202,6 +202,10 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void mousePressed(MouseEvent e) {
 
+        if (e.getClickCount() > 1) {
+            initShimpNumbers();
+            return;
+        }
         System.out.println("Pos x: " + e.getX() + " y: " + e.getY());
 
         int clickedOn = -1;
@@ -217,16 +221,16 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
         }
 
         if (clickedOn == sequence) {
-            MTools.println("correct: " + sequence + " clickedOn: " + clickedOn);
+            System.out.println("correct: " + sequence + " clickedOn: " + clickedOn);
             sequence++;
             if (sequence == allNumbers.size()) {
                 playFanfare();
-                MTools.println("all correct!");
+                System.out.println("all correct!");
                 sequence = 0;
                 coverOn = false;
             }
         } else {
-            MTools.println("false:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
+            System.out.println("false:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
             playBuzzer();
             coverOn = false;
         }
@@ -256,8 +260,10 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
+        System.out.println("key: " + e.getKeyCode());
         switch (e.getKeyCode()) {
 
+            case 521:
             case 93:
                 numNumbers++;
                 if (numNumbers > 9) {
@@ -268,6 +274,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
                 repaint();
                 break;
 
+            case 45:
             case 47:
                 numNumbers--;
                 if (numNumbers < 3) {
