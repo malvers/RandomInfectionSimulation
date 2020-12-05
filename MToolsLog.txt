@@ -1,50 +1,14 @@
-soundVolume: 0.6999999
-setVolume() - volume: -3.09804
-Xperimental ...
-Playing sound: sound/Oli_de-DE_male.wav
-Playing sound: sound/Tim_de-DE_male.wav
-Playing sound: sound/Alex_de-DE_male.wav
-Playing sound: sound/Josi_de-DE_male.wav
-Playing sound: sound/Josi_de-DE_female.wav
-Playing sound: sound/Tiffany_de-DE_male.wav
-Playing sound: sound/Julian_de-DE_female.wav
-Playing sound: sound/Celine_de-DE_female.wav
-Playing sound: sound/Jimmy_de-DE_female.wav
-Playing sound: sound/Celine_de-DE_male.wav
-Playing sound: sound/Tiffany_de-DE_male.wav
-Playing sound: sound/Jimmy_de-DE_female.wav
-Playing sound: sound/Julian_de-DE_male.wav
-Playing sound: sound/Alex_de-DE_male.wav
-Playing sound: sound/Celine_de-DE_female.wav
-Playing sound: sound/Josi_de-DE_male.wav
-Playing sound: sound/Julia_de-DE_female.wav
-Playing sound: sound/Tim_de-DE_female.wav
-Playing sound: sound/Oli_de-DE_male.wav
-Playing sound: sound/Alex_de-DE_male.wav
-Playing sound: sound/Julia_de-DE_male.wav
-Playing sound: sound/Julian_de-DE_female.wav
-Playing sound: sound/Tim_de-DE_male.wav
-Playing sound: sound/Oli_de-DE_male.wav
-Playing sound: sound/Alex_de-DE_male.wav
-Playing sound: sound/Tim_de-DE_female.wav
-Playing sound: sound/Alex_de-DE_female.wav
-Playing sound: sound/Tiffany_de-DE_female.wav
-Playing sound: sound/Jimmy_de-DE_female.wav
-Playing sound: sound/Oli_de-DE_male.wav
-Playing sound: sound/Julia_de-DE_male.wav
-Playing sound: sound/Jimmy_de-DE_male.wav
-Playing sound: sound/Julia_de-DE_male.wav
-Playing sound: sound/Jimmy_de-DE_female.wav
-Playing sound: sound/Tiffany_de-DE_male.wav
-Playing sound: sound/Julian_de-DE_male.wav
-Playing sound: sound/Celine_de-DE_female.wav
-Playing sound: sound/Julia_de-DE_male.wav
-Playing sound: sound/Julian_de-DE_female.wav
-Playing sound: sound/Tim_de-DE_male.wav
-Playing sound: sound/Josi_de-DE_male.wav
-Playing sound: sound/Oli_de-DE_female.wav
-Playing sound: sound/Tiffany_de-DE_male.wav
-Playing sound: sound/Celine_de-DE_female.wav
-Playing sound: sound/Josi_de-DE_male.wav
-Playing sound: sound/Tiffany_de-DE_male.wav
-write high score Klasse: 9a
+initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ 
+whileCount: 2 minDist: 200 count * minDistInit: 1200 sumDist: 2400
+Cover 0
+Cover 1
+correct: 0 clickedOn: 0
+correct: 1 clickedOn: 1
+correct: 2 clickedOn: 2
+correct: 3 clickedOn: 3
+all correct!
+initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ 
+whileCount: 3 minDist: 200 count * minDistInit: 1200 sumDist: 2545
+Cover 0
+Cover 1
+false:   0 clickedOn: 1 game over! 
