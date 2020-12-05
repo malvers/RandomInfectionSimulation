@@ -31,6 +31,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
     static boolean coverOn = false;
     private int sequence = 0;
+    private boolean fanfare = false;
 
     public ShimpTest() {
 
@@ -229,7 +230,9 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
             System.out.println("correct: " + sequence + " clickedOn: " + clickedOn);
             sequence++;
             if (sequence == allNumbers.size()) {
-                playFanfare();
+                if (fanfare) {
+                    playFanfare();
+                }
                 System.out.println("all correct!");
                 sequence = 0;
                 coverOn = false;
@@ -302,6 +305,11 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
             case KeyEvent.VK_C:
                 coverOn = !coverOn;
+                repaint();
+                break;
+
+            case KeyEvent.VK_F:
+                fanfare = !fanfare;
                 repaint();
                 break;
         }
