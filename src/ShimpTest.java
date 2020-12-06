@@ -161,6 +161,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
             os.writeInt(theFrame.getWidth());
             os.writeInt(theFrame.getHeight());
             os.writeInt(numNumbers);
+            os.writeBoolean(fanfare);
 
             Operations.write(os);
 
@@ -183,6 +184,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
             int h = in.readInt();
             theFrame.setBounds(x, y, w, h);
             numNumbers = in.readInt();
+            fanfare = in.readBoolean();
 
             Operations.read(in);
 
@@ -233,17 +235,20 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         }
 
         if (clickedOn == sequence) {
+
+            numChangeDone = true;
 //            System.out.println("correct: - sequence: " + sequence + " clickedOn: " + clickedOn);
             sequence++;
             if (sequence == allNumbers.size()) {
                 if (fanfare) {
-                    play("Chime.wav");
+                    play("sound/Chime.wav");
                 }
                 System.out.println("all correct!");
                 sequence = 0;
                 coverOn = false;
             }
         } else {
+            numChangeDone = true;
 //            System.out.println("false - sequence:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
             sequence = 0;
             play("sound/Buzzer.wav");
