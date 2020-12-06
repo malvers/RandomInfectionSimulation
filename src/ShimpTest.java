@@ -4,17 +4,14 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ShimpTest extends JPanel implements MouseListener, KeyListener {
+public class ShimpTest extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
     private static JFrame theFrame;
     private static Clip clip;
@@ -36,12 +33,15 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
     JPopupMenu popupMenu;
     private Point posOnPress;
+    private boolean mouseDragged = false;
+    private boolean numChangeDone = false;
 
     public ShimpTest() {
 
         numNumbers = 10;
         frame = 50;
         addMouseListener(this);
+        addMouseMotionListener(this);
         addKeyListener(this);
         setFocusable(true);
 
@@ -96,7 +96,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
 
     private void initShimpNumbers() {
 
-        System.out.println("initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ ");
+//        System.out.println("initShimpNumbers(): ++++++++++++++++++++++++++++++++++++++ ");
 
         isInit = true;
 
@@ -147,7 +147,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("Cover " + coverCount);
+//                        System.out.println("Cover: " + coverCount);
                         if (coverCount > 0) {
                             coverOn = true;
                             coverCount = 0;
@@ -217,8 +217,9 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void mousePressed(MouseEvent e) {
 
-        System.out.println("Pos x: " + e.getX() + " y: " + e.getY());
+//        System.out.println("Pos x: " + e.getX() + " y: " + e.getY());
 
+        numChangeDone = false;
         posOnPress = e.getPoint();
         popupMenu.setVisible(false);
 
@@ -247,7 +248,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
         }
 
         if (clickedOn == sequence) {
-            System.out.println("correct: " + sequence + " clickedOn: " + clickedOn);
+//            System.out.println("correct: - sequence: " + sequence + " clickedOn: " + clickedOn);
             sequence++;
             if (sequence == allNumbers.size()) {
                 if (fanfare) {
@@ -258,7 +259,8 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
                 coverOn = false;
             }
         } else {
-            System.out.println("false:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
+//            System.out.println("false - sequence:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
+            sequence = 0;
             playBuzzer();
             coverOn = false;
         }
@@ -268,21 +270,8 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void mouseReleased(MouseEvent e) {
 
-        double dx = posOnPress.getX() - e.getX();
-        double dy = posOnPress.getY() - e.getY();
-
-        if (dy > 100) {
-            incNumbers();
-        }
-        if (dy < 100) {
-            decNumbers();
-        }
-
-        if (System.currentTimeMillis() - mouseIsDown > 1000) {
-//            System.out.println("BINGO!!!!!!");
-//            popupMenu.setLocation(e.getPoint());
-//            popupMenu.setVisible(true);
-        }
+        mouseDragged = false;
+        repaint();
     }
 
     @Override
@@ -296,6 +285,40 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     }
 
     @Override
+    public void mouseDragged(MouseEvent e) {
+
+        if (numChangeDone) {
+            return;
+        }
+
+        mouseDragged = true;
+        double dx = posOnPress.getX() - e.getX();
+        double dy = posOnPress.getY() - e.getY();
+
+//        System.out.println( "dx: " + dx + " dy: " +  dy);
+
+        if (Math.abs(dx) + Math.abs(dy) < 8) {
+            return;
+        }
+
+        if (dy > 100) {
+            incNumbers();
+            initShimpNumbers();
+            numChangeDone = true;
+        } else if (dy < -100) {
+            decNumbers();
+            initShimpNumbers();
+            numChangeDone = true;
+        }
+        repaint();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
+    @Override
     public void keyTyped(KeyEvent e) {
 
     }
@@ -303,12 +326,13 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        System.out.println("key: " + e.getKeyCode());
+//        System.out.println("key: " + e.getKeyCode());
         switch (e.getKeyCode()) {
 
             case 521:
             case 93:
                 incNumbers();
+                initShimpNumbers();
                 writeSettings();
                 repaint();
                 break;
@@ -316,6 +340,7 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
             case 45:
             case 47:
                 decNumbers();
+                initShimpNumbers();
                 writeSettings();
                 repaint();
                 break;
@@ -347,7 +372,6 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
         if (numNumbers > 9) {
             numNumbers = 9;
         }
-        initShimpNumbers();
     }
 
     private void decNumbers() {
@@ -355,7 +379,6 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
         if (numNumbers < 3) {
             numNumbers = 3;
         }
-        initShimpNumbers();
     }
 
     @Override
@@ -372,11 +395,12 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
         g2d.setColor(new Color(0, 0, 80));
         g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
 
+        g2d.setFont(new Font("Arial", Font.PLAIN, 100));
+        g2d.setColor(Color.WHITE);
+
         if (!isInit) {
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, 100));
             g2d.drawImage(image, 0, 0, getWidth(), getHeight(), this);
-            g2d.setColor(Color.WHITE);
             String str = "Beat the shimpanse!";
 
             FontMetrics metrics = g2d.getFontMetrics();
@@ -385,16 +409,28 @@ public class ShimpTest extends JPanel implements MouseListener, KeyListener {
             g2d.drawString(str, (getWidth() - width) / 2, getHeight() / 2 - 180);
         }
 
+        if (mouseDragged) {
+            g2d.setColor(Color.LIGHT_GRAY);
+            g2d.setFont(new Font("Arial", Font.PLAIN, 600));
+            FontMetrics metrics = g2d.getFontMetrics();
+            String str = numNumbers + "";
+            int width = (int) metrics.getStringBounds(str, g2d).getWidth();
+            g2d.drawString(str, (getWidth() - width) / 2, getHeight() / 2 + 200);
+            return;
+        }
+
         for (OneNumber oneNumber : allNumbers) {
             oneNumber.draw(g2d);
         }
     }
 
     public static void main(String[] args) {
+
         theFrame = new JFrame("Beat the shimp ...");
         theFrame.setBounds(800, 160, 600, 600);
         theFrame.setContentPane(new ShimpTest());
         theFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         theFrame.setVisible(true);
     }
+
 }
