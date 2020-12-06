@@ -444,10 +444,10 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         g2d.drawString("Quit the program", xShift, yShift + (yPos * i++));
 
         g2d.drawString("Arrow Up", 50, yShift + (yPos * i));
-        g2d.drawString("Increase font size", xShift, yShift + (yPos * i++));
+        g2d.drawString("Increase font size (" + numSize + ")", xShift, yShift + (yPos * i++));
 
         g2d.drawString("Arrow Down", 50, yShift + (yPos * i));
-        g2d.drawString("Decrease font size", xShift, yShift + (yPos * i++));
+        g2d.drawString("Decrease font size (" + numSize + ")", xShift, yShift + (yPos * i++));
 
         g2d.setFont(new Font("Arial", Font.PLAIN, 16));
         FontMetrics metrics = g2d.getFontMetrics();
