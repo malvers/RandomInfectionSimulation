@@ -5,6 +5,7 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -35,11 +36,14 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
     private Point posOnPress;
     private boolean mouseDragged = false;
     private boolean numChangeDone = false;
+    private boolean doInitOnRelease = false;
+    private boolean showSettings = false;
+    private int numSize = 100;
 
     public ShimpTest() {
 
         numNumbers = 10;
-        frame = 50;
+        frame = 90;
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
@@ -103,7 +107,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
 
                 int xPos = (int) (Math.random() * (getWidth() - (3.6 * frame))) + frame;
                 int yPos = (int) ((int) (Math.random() * (getHeight() - (2 * frame))) + 1.2 * frame);
-                allNumbers.add(new OneNumber("" + (i + 1), xPos, yPos));
+                allNumbers.add(new OneNumber("" + (i + 1), xPos, yPos, numSize ));
 
             }
             /// check for distance
@@ -213,7 +217,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         mouseIsDown = System.currentTimeMillis();
 
         if (e.getClickCount() > 1) {
-            initShimpNumbers();
+            showSettings = !showSettings;
             return;
         }
 
@@ -243,7 +247,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
                 if (fanfare) {
                     play("sound/Chime.wav");
                 }
-                System.out.println("all correct!");
+//                System.out.println("all correct!");
                 sequence = 0;
                 coverOn = false;
             }
@@ -260,6 +264,10 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void mouseReleased(MouseEvent e) {
 
+        if (doInitOnRelease) {
+            doInitOnRelease = false;
+            initShimpNumbers();
+        }
         mouseDragged = false;
         repaint();
     }
@@ -285,7 +293,6 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         double dx = posOnPress.getX() - e.getX();
         double dy = posOnPress.getY() - e.getY();
 
-//        System.out.println( "dx: " + dx + " dy: " +  dy);
 
         if (Math.abs(dx) + Math.abs(dy) < 8) {
             return;
@@ -299,10 +306,21 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         } else if (dy < -100) {
             decNumbers();
             initShimpNumbers();
-            numChangeDone = true;
+//            numChangeDone = true;
             repaint();
         }
 
+        if (dx < -100) {
+            fanfare = !fanfare;
+            repaint();
+        }
+
+        if (dx > 100) {
+            doInitOnRelease = true;
+            numChangeDone = true;
+            mouseDragged = false;
+            repaint();
+        }
     }
 
     @Override
@@ -347,6 +365,20 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
                 repaint();
                 break;
 
+            case KeyEvent.VK_UP:
+                numSize += 5;
+                if( numSize > 120 ) numSize = 120;
+                initShimpNumbers();
+                repaint();
+                break;
+
+            case KeyEvent.VK_DOWN:
+                numSize -= 5;
+                if( numSize < 60 ) numSize = 60;
+                initShimpNumbers();
+                repaint();
+                break;
+
             case KeyEvent.VK_C:
                 coverOn = !coverOn;
                 repaint();
@@ -378,6 +410,53 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
 
     }
 
+    private void drawHelp(Graphics2D g2d) {
+
+        g2d.setColor(ColorSheme.darkBlue);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        int size = 30;
+        g2d.setFont(new Font("Arial", Font.PLAIN, size));
+        g2d.setColor(Color.ORANGE);
+
+        int yShift = size;
+        int xShift = 360;
+        int i = 1;
+        float yPos = (float) (1.2 * size);
+        g2d.drawString("Double click   ", 50, ((yShift + yPos * i)));
+        g2d.drawString("Show | hide this page", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Swipe Up", 50, yShift + (yPos * i));
+        g2d.drawString("Increase numbers", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Swipe Down", 50, yShift + (yPos * i));
+        g2d.drawString("Decrease numbers", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Swipe left", 50, yShift + (yPos * i));
+        g2d.drawString("Next combination", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Space bar", 50, yShift + (yPos * i));
+        g2d.drawString("Next combination", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Swipe right", 50, yShift + (yPos * i));
+        g2d.drawString("play chime | fanfare", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("ESC", 50, yShift + (yPos * i));
+        g2d.drawString("Quit the program", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Arrow Up", 50, yShift + (yPos * i));
+        g2d.drawString("Increase font size", xShift, yShift + (yPos * i++));
+
+        g2d.drawString("Arrow Down", 50, yShift + (yPos * i));
+        g2d.drawString("Decrease font size", xShift, yShift + (yPos * i++));
+
+        g2d.setFont(new Font("Arial", Font.PLAIN, 16));
+        FontMetrics metrics = g2d.getFontMetrics();
+        String str = "Beat the shimpanse by Dr. Michael R. Alvers - ©2020 - all rights reserved";
+        Rectangle2D bounds = metrics.getStringBounds(str, g2d);
+        g2d.setColor(Color.GRAY);
+        g2d.drawString(str, (float) (getWidth() / 2 - bounds.getWidth() / 2), getHeight() - 30);
+    }
+
     @Override
     public void paint(Graphics g) {
 
@@ -386,6 +465,13 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
 
         g2d.setColor(new Color(0, 0, 80));
         g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+
+        if( showSettings ) {
+
+            drawHelp(g2d);
+
+            return;
+        }
 
         g2d.setFont(new Font("Arial", Font.PLAIN, 100));
         g2d.setColor(Color.WHITE);

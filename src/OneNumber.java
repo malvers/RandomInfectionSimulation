@@ -1,37 +1,53 @@
-import java.awt.*;
+import mratools.MTools;
 
-public class OneNumber extends Rectangle {
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+
+public class OneNumber {
 
     public static Color niceGreen = new Color(113, 197, 37);
     String name;
+    private Rectangle rect;
+    int x;
+    int y;
+    int width;
+    int height;
 
-    public OneNumber(String nameIn, int xIn, int yIn) {
+    public OneNumber(String nameIn, int xIn, int yIn, int heightIn) {
 
-        height = 60;
         x = xIn;
         y = yIn;
-        width = 60;
+        height = heightIn;
+        width = height;
 
         name = nameIn;
     }
 
-    @Override
     public boolean contains(Point p) {
-        p.y += height - 8;
-        p.x += 13;
-        return super.contains(p);
+        return rect.contains(p);
     }
 
     public void draw(Graphics2D g2d) {
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, 60));
+        g2d.setFont(new Font("Arial", Font.PLAIN, height));
         g2d.setColor(Color.ORANGE);
         g2d.drawString(name, x, y);
         g2d.setColor(Color.WHITE);
+
+        FontMetrics metrics = g2d.getFontMetrics();
+        Rectangle2D bounds = metrics.getStringBounds(name, g2d);
+
+        int boxSize = height + 10;
+        int dx = (int) ((bounds.getWidth() - boxSize) / 2.0);
+        int dy = (int) ((bounds.getHeight() - boxSize) / 2.0);
+
+//        MTools.println("dx: " + dx + " dy: " + dy + " getHeight: " + bounds.getHeight() + " box: " + boxSize);
+
+        rect = new Rectangle(x + dx, (int) (y - dy - (boxSize / 1.2)), boxSize, boxSize);
         if (ShimpTest.coverOn) {
-            g2d.fill(new Rectangle(x - 13, y + 8 - height, width, height));
+            g2d.fill(rect);
         } else {
-            g2d.draw(new Rectangle(x - 13, y + 8 - height, width, height));
+            g2d.draw(rect);
         }
     }
 
