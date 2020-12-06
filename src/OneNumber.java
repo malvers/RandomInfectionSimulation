@@ -24,6 +24,7 @@ public class OneNumber {
     }
 
     public boolean contains(Point p) {
+        if( rect == null ) return false;
         return rect.contains(p);
     }
 
