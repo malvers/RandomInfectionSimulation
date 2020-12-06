@@ -229,8 +229,8 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
             }
         }
 
+        /// nix getroffen, nix gemacht
         if (clickedOn == -1) {
-            sequence = 0;
             return;
         }
 
@@ -295,12 +295,14 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
             incNumbers();
             initShimpNumbers();
             numChangeDone = true;
+            repaint();
         } else if (dy < -100) {
             decNumbers();
             initShimpNumbers();
             numChangeDone = true;
+            repaint();
         }
-        repaint();
+
     }
 
     @Override
