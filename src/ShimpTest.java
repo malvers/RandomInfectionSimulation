@@ -64,27 +64,12 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         popupMenu.add("Blu");
     }
 
-    private static void playBuzzer() {
+    private static void play(String name) {
 
         AudioInputStream audioInputStream = null;
         try {
             clip = null;
-            audioInputStream = AudioSystem.getAudioInputStream(new File("sound/Buzzer.wav").getAbsoluteFile());
-            clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-        } catch (UnsupportedAudioFileException | LineUnavailableException e) {
-            e.printStackTrace();
-        } catch (IOException ignored) {
-        }
-        clip.start();
-    }
-
-    private static void playFanfare() {
-
-        AudioInputStream audioInputStream = null;
-        try {
-            clip = null;
-            audioInputStream = AudioSystem.getAudioInputStream(new File("sound/Fanfare.wav").getAbsoluteFile());
+            audioInputStream = AudioSystem.getAudioInputStream(new File(name).getAbsoluteFile());
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (UnsupportedAudioFileException | LineUnavailableException e) {
@@ -252,7 +237,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
             sequence++;
             if (sequence == allNumbers.size()) {
                 if (fanfare) {
-                    playFanfare();
+                    play("Chime.wav");
                 }
                 System.out.println("all correct!");
                 sequence = 0;
@@ -261,7 +246,7 @@ public class ShimpTest extends JPanel implements MouseListener, MouseMotionListe
         } else {
 //            System.out.println("false - sequence:   " + sequence + " clickedOn: " + clickedOn + " game over! ");
             sequence = 0;
-            playBuzzer();
+            play("sound/Buzzer.wav");
             coverOn = false;
         }
         repaint();
